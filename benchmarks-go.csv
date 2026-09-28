@@ -1,0 +1,9 @@
+goos: linux
+goarch: amd64
+pkg: CivicOs/cmd/ingest
+cpu: 13th Gen Intel(R) Core(TM) i5-13420H
+BenchmarkDecodeEvent-12          	  361638	      3581 ns/op	     600 B/op	      12 allocs/op
+BenchmarkEventQueuePublish-12    	39483733	        31.45 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAppendEventJSON-12      	 1771786	       713.9 ns/op	     152 B/op	       7 allocs/op
+PASS
+ok  	CivicOs/cmd/ingest	7.160s
