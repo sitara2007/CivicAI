@@ -19,7 +19,7 @@ import (
 	"syscall"
 	"time"
 
-	"CivicOs/internal/middleware"
+	"CivicAI/internal/middleware"
 )
 
 const (

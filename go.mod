@@ -1,3 +1,3 @@
-module CivicOs
+module CivicAI
 
 go 1.23
