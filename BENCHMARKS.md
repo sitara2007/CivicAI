@@ -15,3 +15,16 @@
 **Reproduce:** `pytest tests/test_hash_chain_bench.py --benchmark-only --benchmark-json=benchmarks.json --benchmark-sort=mean`
 
 **Notes:** Outliers up to 9.6 ms observed (GC/scheduling). Single-threaded. Python-only; Go ingest path benchmark pending.
+
+## Go Ingest Path Benchmarks
+
+**Machine:** Intel i5-13420H, Go 1.26.0
+**Date:** 2026-09-28
+
+| Benchmark | ns/op | B/op | allocs/op | Throughput |
+|---|---|---|---|---|
+| BenchmarkEventQueuePublish | 32.68 | 0 | 0 | 30.6M ops/sec |
+| BenchmarkAppendEventJSON | 724.3 | 152 | 7 | 1.38M ops/sec |
+| BenchmarkDecodeEvent | (pending fix) | — | — | — |
+
+**Reproduce:** `go test -bench=. -benchmem -run=^$ ./cmd/ingest/...`
