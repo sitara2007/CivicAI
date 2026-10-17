@@ -96,7 +96,7 @@ pip install -r requirements.txt
 - [x] Deployed (Vercel + Railway)
 - [ ] Go `DecodeEvent` benchmark fix
 - [ ] End-to-end throughput and latency benchmark
-- [ ] [FILL: next item]
+- [ ] Fix Dependabot alerts (2 high, 4 moderate, 2 low)
 
 ## License
 
