@@ -1,69 +1,103 @@
 # CivicAI
 
-AI-powered workflow automation engine for government and public sector document triage, classification, and routing.
+**AI workflow engine for government and public-sector document triage, classification and routing, with PII redaction and a tamper-evident audit trail.**
 
-## 🌐 Live Infrastructure & Deployment
+[Live demo](https://civic-ai-gray.vercel.app) · [Benchmarks](./BENCHMARKS.md) · [Security](./SECURITY.md)
 
-- **Frontend Application:** [https://civic-ai-gray.vercel.app](https://civic-ai-gray.vercel.app)
-- **Database Engine:** Managed PostgreSQL on [Railway](https://railway.com) (Driver-level SSL Enforced)
-- **Healthcheck Endpoint:** `GET /health` (Returns `200 OK`)
+<!-- TODO: add architecture diagram: ![CivicAI architecture](docs/architecture.png) -->
 
 ---
 
-## ⚡ Technical Architecture
+## What it does
 
-- **Cryptographic Audit Trail:** Hash-chain audit log where each document state is chained to prevent post-hoc tampering.
-- **Strict Data Isolation:** Enforced TLS connections (`sslmode=require`) at driver layer for compliance.
-- **Low-Latency Ingestion:** Optimized for high-throughput PII redaction and document triage.
+1. **Ingests** documents through a Go service (`cmd/ingest`).
+2. **Redacts PII** in middleware (`internal/middleware`) before documents reach the model layer.
+3. **Classifies and routes** documents with a Python RAG service (`python-rag-service`).
+4. **Records every state change** in a hash-chained audit log, so editing a past record breaks every hash after it.
 
----
+## Architecture
 
-## 🛠️ Local Setup
+| Layer | Tech | Path |
+|---|---|---|
+| Frontend | Next.js (App Router), deployed on Vercel, deployed on Vercel | `frontend/` |
+| Ingestion + PII redaction | Go | `cmd/ingest`, `internal/middleware` |
+| Classification / routing | Python (RAG) | `python-rag-service/` |
+| Database | PostgreSQL on Railway, `sslmode=require`, Alembic migrations | `schema/`, `alembic.ini` |
+| Evaluation | Python | `eval/` |
+| Tests | pytest, Go test | `tests/` |
+
+Health check: `GET /health` returns `200 OK`.
+
+## Audit trail
+
+Each document state transition stores the hash of the previous entry:
+
+```
+entry[n].hash = H(entry[n].payload || entry[n-1].hash)
+```
+
+Changing any past record invalidates all later hashes.
+
+## Benchmarks
+
+Measured on an Intel i5-13420H (12 cores, WSL2), 2026-09-28. Full details and reproduce commands: [BENCHMARKS.md](./BENCHMARKS.md).
+
+**Hash chain (Python 3.14.4, pytest-benchmark, single-threaded)**
+
+| Operation | Median | Throughput |
+|---|---|---|
+| genesis_hash | 261 ns | 2.58 M ops/s |
+| compute_prev_hash (3 keys) | 4.37 µs | 116,175 ops/s |
+| compute_prev_hash (100+ elements) | 10.17 µs | 74,184 ops/s |
+
+**Go ingest path (Go 1.26.0)**
+
+| Benchmark | ns/op | allocs/op | Throughput |
+|---|---|---|---|
+| EventQueuePublish | 32.68 | 0 | 30.6 M ops/s |
+| AppendEventJSON | 724.3 | 7 | 1.38 M ops/s |
+
+**Limitations:** these are micro-benchmarks of individual components, not end-to-end request throughput. `DecodeEvent` benchmark is pending a fix. Outliers up to 9.6 ms were observed (GC/scheduling).
+
+Reproduce:
 
 ```bash
-# Clone repository
-git clone [https://github.com/sitara2007/CivicOs.git](https://github.com/sitara2007/CivicOs.git)
-cd CivicOs
+pytest tests/test_hash_chain_bench.py --benchmark-only --benchmark-sort=mean
+go test -bench=. -benchmem -run=^$ ./cmd/ingest/...
+```
 
-# Setup virtual environment
+## Run locally
+
+```bash
+git clone https://github.com/sitara2007/CivicAI.git
+cd CivicAI
+cp .env.example .env     # fill in your values
+docker compose up --build
+```
+
+Without Docker:
+
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
-
-# Install dependencies
 pip install -r requirements.txt
-cat << 'EOF' > README.md
-# govflowai
+```
 
-AI-powered workflow automation engine for government and public sector document triage, classification, and routing.
+## Security
 
-## 🌐 Live Infrastructure & Deployment
+- TLS enforced at the database driver level (`sslmode=require`)
+- PII redaction before model calls
+- Hash-chained audit log
+- Reporting vulnerabilities: see [SECURITY.md](./SECURITY.md)
 
-- **Frontend Application:** [https://civic-ai-gray.vercel.app](https://civic-ai-gray.vercel.app)
-- **Database Engine:** Managed PostgreSQL on Railway (Driver-level SSL Enforced)
-- **Healthcheck Endpoint:** `GET /health` (Returns `200 OK`)
+## Status
 
----
+- [x] Ingestion, redaction, classification, audit chain
+- [x] Deployed (Vercel + Railway)
+- [ ] Go `DecodeEvent` benchmark fix
+- [ ] End-to-end throughput and latency benchmark
+- [ ] Fix Dependabot alerts (2 high, 4 moderate, 2 low)
 
-## ⚡ Technical Architecture
+## License
 
-- **Cryptographic Audit Trail:** Hash-chain audit log where each document state is chained to prevent post-hoc tampering.
-- **Strict Data Isolation:** Enforced TLS connections (`sslmode=require`) at driver layer for compliance.
-- **Low-Latency Ingestion:** Optimized for high-throughput PII redaction and document triage.
-
----
-
-## 🛠️ Local Setup
-
-Clone the repository:
-  git clone [https://github.com/sitara2007/CivicOs.git](https://github.com/sitara2007/CivicOs.git)
-  cd CivicOs
-
-Setup virtual environment:
-  python3 -m venv .venv
-  source .venv/bin/activate
-  pip install -r requirements.txt
-
----
-
-## 👥 Real Users & Pilots
-- Currently onboarding initial pilot users in legal tech & public document processing.
+MIT
