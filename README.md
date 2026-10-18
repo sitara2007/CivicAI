@@ -2,29 +2,29 @@
 
 **AI workflow engine for government and public-sector document triage, classification and routing, with PII redaction and a tamper-evident audit trail.**
 
-[Live demo](https://civic-ai-gray.vercel.app) · [Benchmarks](./BENCHMARKS.md) · [Security](./SECURITY.md)
+[![CI](https://github.com/sitara2007/CivicAI/actions/workflows/ci.yml/badge.svg)](https://github.com/sitara2007/CivicAI/actions/workflows/ci.yml)
 
-<!-- TODO: add architecture diagram: ![CivicAI architecture](docs/architecture.png) -->
+[Live demo](https://civic-ai-gray.vercel.app) · [Benchmarks](./BENCHMARKS.md) · [Security](./SECURITY.md)
 
 ---
 
 ## What it does
 
 1. **Ingests** documents through a Go service (`cmd/ingest`).
-2. **Redacts PII** in middleware (`internal/middleware`) before documents reach the model layer.
-3. **Classifies and routes** documents with a Python RAG service (`python-rag-service`).
+2. **Redacts PII** in the Python processing pipeline before classification; regex fallback is used when Presidio is unavailable.
+3. **Classifies and routes** documents in the FastAPI service (`app/`) with optional RAG retrieval (`app/services/rag/`, `python-rag-service/`).
 4. **Records every state change** in a hash-chained audit log, so editing a past record breaks every hash after it.
 
 ## Architecture
 
 | Layer | Tech | Path |
 |---|---|---|
-| Frontend | Next.js (App Router), deployed on Vercel, deployed on Vercel | `frontend/` |
-| Ingestion + PII redaction | Go | `cmd/ingest`, `internal/middleware` |
-| Classification / routing | Python (RAG) | `python-rag-service/` |
-| Database | PostgreSQL on Railway, `sslmode=require`, Alembic migrations | `schema/`, `alembic.ini` |
+| Frontend | Next.js (App Router) | `frontend/` |
+| Ingestion + mTLS | Go | `cmd/ingest/`, `internal/middleware/` |
+| Classification / routing | Python FastAPI with optional RAG | `app/`, `python-rag-service/` |
+| Database | Async SQLAlchemy/PostgreSQL; no PostgreSQL DDL or Alembic migration scripts are checked in | `app/db/`, `alembic.ini` |
 | Evaluation | Python | `eval/` |
-| Tests | pytest, Go test | `tests/` |
+| Tests | pytest and Go test; embeddings and database are stubbed in Python tests | `tests/` |
 
 Health check: `GET /health` returns `200 OK`.
 
@@ -62,9 +62,15 @@ Measured on an Intel i5-13420H (12 cores, WSL2), 2026-09-28. Full details and re
 Reproduce:
 
 ```bash
-pytest tests/test_hash_chain_bench.py --benchmark-only --benchmark-sort=mean
+uv run pytest tests/test_hash_chain_bench.py --benchmark-only --benchmark-sort=mean
 go test -bench=. -benchmem -run=^$ ./cmd/ingest/...
 ```
+
+These are component performance benchmarks, not model-quality metrics. No classification or RAG quality metrics have been published.
+
+## Testing and quality
+
+CI runs `uv sync --extra dev` and `uv run pytest -q`. Python tests use deterministic embedding stubs and an in-memory database repository; they do not test against PostgreSQL. The real Presidio backend is not exercised in CI because its default analyzer requires the spaCy `en_core_web_lg` model download. CI tests the regex fallback instead.
 
 ## Run locally
 
@@ -78,14 +84,19 @@ docker compose up --build
 Without Docker:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+uv sync --extra dev
+uv run pytest -q
+```
+
+To install the optional RAG dependencies as well:
+
+```bash
+uv sync --extra dev --extra rag
 ```
 
 ## Security
 
-- TLS enforced at the database driver level (`sslmode=require`)
+- Database TLS depends on the `DATABASE_URL` configuration; `.env.example` is for local development.
 - PII redaction before model calls
 - Hash-chained audit log
 - Reporting vulnerabilities: see [SECURITY.md](./SECURITY.md)
@@ -93,10 +104,10 @@ pip install -r requirements.txt
 ## Status
 
 - [x] Ingestion, redaction, classification, audit chain
-- [x] Deployed (Vercel + Railway)
+- [ ] Verify Vercel and Railway deployment status (not verifiable from checked-in configuration)
 - [ ] Go `DecodeEvent` benchmark fix
 - [ ] End-to-end throughput and latency benchmark
-- [ ] Fix Dependabot alerts (2 high, 4 moderate, 2 low)
+- [ ] Review dependency alerts (current status not verified)
 
 ## License
 
