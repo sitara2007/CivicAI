@@ -17,7 +17,7 @@ COPY pyproject.toml ./
 # Pip upgrade aur PyTorch install ko alag step mein rakho
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
     pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu && \
-    pip install --no-cache-dir .
+    pip install --no-cache-dir '.[rag]'
 
 # 3. Runtime Stage
 FROM base AS runtime
