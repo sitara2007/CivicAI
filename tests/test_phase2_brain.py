@@ -82,6 +82,8 @@ async def test_three_documents_classify_correctly(case: dict[str, str]) -> None:
     assert decision["department"] == case["gold_department"]
     assert 0.0 <= decision["confidence"] <= 1.0
     assert data["hop_count"] == 1
+    assert data["redacted_text"] == case["text"]
+    assert len(data["audit_hash"]) == 64
 
 
 def test_presidio_masks_pii_before_llm() -> None:

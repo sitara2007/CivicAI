@@ -20,3 +20,8 @@ jobs:
         run: uv sync --extra dev
       - name: Run tests
         run: uv run pytest -q
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Run Go tests
+        run: go test ./...

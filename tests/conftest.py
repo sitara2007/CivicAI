@@ -9,6 +9,7 @@ from app.api.deps import get_db_session
 from app.core.config import get_settings
 from app.db.models import Decision, Document, DocumentStatus
 from app.main import app
+from app.services.audit.chain_store import JSONLAuditStore
 
 EMBEDDING_DIM = 384  # all-MiniLM-L6-v2; change if you use another model
 
@@ -50,6 +51,13 @@ def no_hf_network(monkeypatch):
     get_settings.cache_clear()
     yield
     get_settings.cache_clear()
+
+
+@pytest.fixture(autouse=True)
+def isolate_audit_chain(tmp_path, monkeypatch):
+    from app.api.v1 import process
+
+    monkeypatch.setattr(process, "audit_store", JSONLAuditStore(tmp_path / "audit-chain.jsonl"))
 
 
 @pytest.fixture(autouse=True)

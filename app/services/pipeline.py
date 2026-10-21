@@ -23,6 +23,7 @@ class PipelineResult:
     requires_review: bool
     hop_count: int = 0
     pii_entities_masked: int = 0
+    redacted_text: str | None = None
 
 
 class PipelineService:
@@ -62,6 +63,7 @@ class PipelineService:
                 requires_review=requires_review,
                 hop_count=hop_count,
                 pii_entities_masked=entity_count,
+                redacted_text=redacted_text,
             )
         except SanitizationError:
             logger.error("pipeline_sanitization_failed", extra={"trace_id": str(trace_id)})

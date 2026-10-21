@@ -70,14 +70,14 @@ func (q *eventQueue) publish(e *AuditEvent) bool {
 }
 
 type ingestRequest struct {
-	TenantID string          `json:"tenant_id"`
-	Sequence uint64          `json:"sequence"`
-	Source   string          `json:"source"`
-	TS       time.Time       `json:"timestamp"`
-	EventType string         `json:"event_type"`
-	TraceID  string         `json:"trace_id"`
-	Sig      string          `json:"sig"`
-	Payload  json.RawMessage `json:"payload"`
+	TenantID  string          `json:"tenant_id"`
+	Sequence  uint64          `json:"sequence"`
+	Source    string          `json:"source"`
+	TS        time.Time       `json:"timestamp"`
+	EventType string          `json:"event_type"`
+	TraceID   string          `json:"trace_id"`
+	Sig       string          `json:"sig"`
+	Payload   json.RawMessage `json:"payload"`
 }
 
 type clickHouseBatchWriter struct {
@@ -415,6 +415,24 @@ func httpHandler(q *eventQueue) http.HandlerFunc {
 	}
 }
 
+func redactDocumentHandler(w http.ResponseWriter, r *http.Request) {
+	text, ok := middleware.RedactedTextFromContext(r.Context())
+	if !ok {
+		http.Error(w, "redacted document missing", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(struct {
+		RedactedText      string `json:"redacted_text"`
+		PIIEntitiesMasked int    `json:"pii_entities_masked"`
+	}{
+		RedactedText:      text,
+		PIIEntitiesMasked: middleware.RedactedCountFromContext(r.Context()),
+	}); err != nil {
+		log.Printf("write redaction response: %v", err)
+	}
+}
+
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -435,6 +453,9 @@ func main() {
 	mux.Handle("/v1/audit-events", middleware.MTLSMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		httpHandler(queue)(w, r)
 	})))
+	mux.Handle("/v1/redact", middleware.MTLSMiddleware(
+		middleware.PIIRedactionMiddleware(http.HandlerFunc(redactDocumentHandler)),
+	))
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})

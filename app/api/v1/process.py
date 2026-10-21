@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+import logging
 import time
 import uuid
 from datetime import datetime, timezone
@@ -19,8 +21,10 @@ from app.schemas.process import (
     ProcessResponse,
 )
 from app.services.pipeline import PipelineService
+from app.services.audit.chain_store import AuditChainError, audit_store
 
 router = APIRouter(prefix="/api/v1", tags=["process"])
+logger = logging.getLogger(__name__)
 
 
 @router.post(
@@ -84,6 +88,24 @@ async def process_document(
             },
         )
 
+    created_at = datetime.now(timezone.utc)
+    audit_hash: str | None = None
+    if result.status == "completed" and result.decision is not None and result.redacted_text is not None:
+        audit_payload = {
+            "trace_id": str(trace_id),
+            "document_id": str(document_id),
+            "redacted_text": result.redacted_text,
+            "pii_entities_masked": result.pii_entities_masked,
+            "decision": result.decision.model_dump(mode="json"),
+            "created_at": created_at.isoformat(),
+        }
+        try:
+            entry = await asyncio.to_thread(audit_store.append, audit_payload)
+        except (AuditChainError, OSError, TypeError, ValueError) as exc:
+            logger.error("audit_chain_append_failed", extra={"trace_id": str(trace_id), "error": str(exc)})
+            raise HTTPException(status_code=500, detail="Audit record could not be written") from exc
+        audit_hash = entry.hash
+
     return ProcessResponse(
         trace_id=trace_id,
         document_id=document_id,
@@ -92,7 +114,9 @@ async def process_document(
         requires_review=result.requires_review,
         hop_count=result.hop_count or None,
         pii_entities_masked=result.pii_entities_masked,
-        created_at=datetime.now(timezone.utc),
+        redacted_text=result.redacted_text,
+        audit_hash=audit_hash,
+        created_at=created_at,
     )
 
 
