@@ -66,6 +66,8 @@ class ProcessResponse(BaseModel):
     requires_review: bool = False
     hop_count: int | None = None
     pii_entities_masked: int = 0
+    redacted_text: str | None = None
+    audit_hash: str | None = None
     created_at: datetime
 
 
