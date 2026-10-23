@@ -1,7 +1,7 @@
 # CivicAI
 
 **AI workflow engine for government and public-sector document triage, classification and routing, with PII redaction and a tamper-evident audit trail.**
-
+**Replaces multi-day manual government document sorting with sub-second automated triage and tamper-proof auditing.**
 [![CI](https://github.com/sitara2007/CivicAI/actions/workflows/ci.yml/badge.svg)](https://github.com/sitara2007/CivicAI/actions/workflows/ci.yml)
 
 [Live demo](https://civic-ai-gray.vercel.app) · [Benchmarks](./BENCHMARKS.md) · [Security](./SECURITY.md)
