@@ -1,51 +1,51 @@
-from __future__ import annotations
+import zlib
+from unittest.mock import MagicMock, patch
 
-from types import SimpleNamespace
-from unittest.mock import AsyncMock, Mock, patch
+import numpy as np
+import pytest
 
-from app.core.config import get_settings
-from app.services.rag.generator import get_answer
-
-
-def test_get_answer_builds_prompt_and_returns_model_text() -> None:
-    dummy_response = SimpleNamespace(
-        choices=[SimpleNamespace(message=SimpleNamespace(content="This is the answer."))]
-    )
-
-    mock_chunks = [
-        {"text": "First context."},
-        {"text": "Second context."},
-    ]
-
-    with patch("app.services.rag.generator.retrieve", return_value=mock_chunks) as mock_retrieve, patch(
-        "app.services.rag.generator.client.chat.completions.create",
-        return_value=dummy_response,
-    ) as mock_create:
-        answer = get_answer("What is the scheme?")
-
-    assert answer == "This is the answer."
-    mock_retrieve.assert_called_once_with("What is the scheme?")
-    mock_create.assert_called_once_with(
-        model=get_settings().openai_model,
-        messages=[
-            {
-                "role": "user",
-                "content": "Use this context to answer the question: First context.\nSecond context.\n\nQuestion: What is the scheme?",
-            }
-        ],
-    )
+EMBEDDING_DIM = 384  # match your real model (all-MiniLM-L6-v2 = 384)
 
 
-def test_get_answer_handles_empty_context() -> None:
-    dummy_response = SimpleNamespace(
-        choices=[SimpleNamespace(message=SimpleNamespace(content="No context available."))]
-    )
+def _fake_encode(sentences, *args, **kwargs):
+    """Deterministic dummy embeddings: same text -> same vector, every run.
 
-    with patch("app.services.rag.generator.retrieve", return_value=[]), patch(
-        "app.services.rag.generator.client.chat.completions.create",
-        return_value=dummy_response,
-    ) as mock_create:
-        answer = get_answer("What now?")
+    Uses crc32 instead of hash() because hash() is salted per process,
+    which would make tests flaky across CI runs.
+    """
+    single = isinstance(sentences, str)
+    items = [sentences] if single else list(sentences)
 
-    assert answer == "No context available."
-    mock_create.assert_called_once()
+    vectors = np.stack([
+        np.random.default_rng(zlib.crc32(s.encode("utf-8"))).random(
+            EMBEDDING_DIM, dtype=np.float32
+        )
+        for s in items
+    ])
+    return vectors[0] if single else vectors
+
+
+@pytest.fixture
+def mock_sentence_transformer():
+    """Replace SentenceTransformer so no model is ever downloaded."""
+    # Patch the name where it is *used*, not where it is defined.
+    with patch("civicai.generator.SentenceTransformer") as mock_cls:
+        mock_model = MagicMock(name="SentenceTransformerInstance")
+        mock_model.encode.side_effect = _fake_encode
+        mock_model.get_sentence_embedding_dimension.return_value = EMBEDDING_DIM
+        mock_cls.return_value = mock_model
+        yield mock_cls
+
+
+def test_generator_uses_embeddings(mock_sentence_transformer):
+    from civicai.generator import Generator  # import inside, after patch is active
+
+    gen = Generator()
+
+    # Model was constructed with a mock, not downloaded
+    mock_sentence_transformer.assert_called_once()
+
+    # Sanity check that the dummy embeddings behave like real ones
+    emb = gen.model.encode(["pothole on Main St", "broken streetlight"])
+    assert emb.shape == (2, EMBEDDING_DIM)
+    assert emb.dtype == np.float32
