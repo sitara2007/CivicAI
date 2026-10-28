@@ -112,3 +112,7 @@ uv sync --extra dev --extra rag
 ## License
 
 MIT
+
+## Related Work / Utilities
+
+- **[Real Subprocess Timeout Test](https://gist.github.com/sitara2007/c953cf129d0c191a941da453ab47477d)**: A Python-based test harness that measures OS-level subprocess startup and handles real timeout failures under concurrent loads. Built to understand failure modes in high-concurrency agent environments.
