@@ -40,7 +40,7 @@ def mock_sentence_transformer():
 
 def test_generator_uses_embeddings(mock_sentence_transformer):
     # FIXED: civicai -> app
-    from app.services.rag.generator import Generator from app.services.rag.generator import Generator
+    from app.services.rag.generator import Generator
     gen = Generator()
 
     # Model was constructed with a mock, not downloaded
