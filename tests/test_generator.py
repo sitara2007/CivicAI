@@ -4,15 +4,10 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pytest
 
-EMBEDDING_DIM = 384  # match your real model (all-MiniLM-L6-v2 = 384)
+EMBEDDING_DIM = 384
 
 
 def _fake_encode(sentences, *args, **kwargs):
-    """Deterministic dummy embeddings: same text -> same vector, every run.
-
-    Uses crc32 instead of hash() because hash() is salted per process,
-    which would make tests flaky across CI runs.
-    """
     single = isinstance(sentences, str)
     items = [sentences] if single else list(sentences)
 
@@ -27,9 +22,6 @@ def _fake_encode(sentences, *args, **kwargs):
 
 @pytest.fixture
 def mock_sentence_transformer():
-    """Replace SentenceTransformer so no model is ever downloaded."""
-    # Patch the name where it is *used*, not where it is defined.
-    # FIXED: civicai -> app
     with patch("app.services.rag.generator.SentenceTransformer") as mock_cls:
         mock_model = MagicMock(name="SentenceTransformerInstance")
         mock_model.encode.side_effect = _fake_encode
@@ -39,14 +31,12 @@ def mock_sentence_transformer():
 
 
 def test_generator_uses_embeddings(mock_sentence_transformer):
-    # FIXED: civicai -> app
     from app.services.rag.generator import Generator
+
     gen = Generator()
 
-    # Model was constructed with a mock, not downloaded
     mock_sentence_transformer.assert_called_once()
 
-    # Sanity check that the dummy embeddings behave like real ones
     emb = gen.model.encode(["pothole on Main St", "broken streetlight"])
     assert emb.shape == (2, EMBEDDING_DIM)
     assert emb.dtype == np.float32
