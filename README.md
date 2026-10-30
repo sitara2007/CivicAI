@@ -2,10 +2,10 @@
 
 **AI workflow engine for government and public-sector document triage, classification and routing, with PII redaction and a tamper-evident audit trail.**
 **Replaces multi-day manual government document sorting with sub-second automated triage and tamper-proof auditing.**
-[![CivicAI CI](https://github.com/sitara2007/CivicAI/actions/workflows/ci.yml/badge.svg)](https://github.com/sitara2007/CivicAI/actions/workflows/ci.yml)
-[![Deploy](https://github.com/sitara2007/CivicAI/actions/workflows/deploy.yml/badge.svg)](https://github.com/sitara2007/CivicAI/actions/workflows/deploy.yml)
+## 🚀 Live Demo
+The backend is live and running on Render: [https://civicai-backend-hb5e.onrender.com](https://civicai-backend-hb5e.onrender.com)
 
-[Live demo](https://civic-ai-gray.vercel.app) · [Benchmarks](./BENCHMARKS.md) · [Security](./SECURITY.md)
+You can explore the interactive API docs here: [https://civicai-backend-hb5e.onrender.com/docs](https://civicai-backend-hb5e.onrender.com/docs)· [Benchmarks](./BENCHMARKS.md) · [Security](./SECURITY.md)
 
 ---
 
