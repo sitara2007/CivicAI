@@ -44,7 +44,6 @@ include = ["app*"]
 [tool.pytest.ini_options]
 pythonpath = ["."]
 asyncio_mode = "auto"
-asyncio_mode = "auto"
 markers = [
     "benchmark: marks tests as benchmarks (deselect with '-m \"not benchmark\"')",
 ]

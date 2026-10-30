@@ -29,7 +29,8 @@ def _fake_encode(sentences, *args, **kwargs):
 def mock_sentence_transformer():
     """Replace SentenceTransformer so no model is ever downloaded."""
     # Patch the name where it is *used*, not where it is defined.
-    with patch("civicai.generator.SentenceTransformer") as mock_cls:
+    # FIXED: civicai -> app
+    with patch("app.generator.SentenceTransformer") as mock_cls:
         mock_model = MagicMock(name="SentenceTransformerInstance")
         mock_model.encode.side_effect = _fake_encode
         mock_model.get_sentence_embedding_dimension.return_value = EMBEDDING_DIM
@@ -38,7 +39,8 @@ def mock_sentence_transformer():
 
 
 def test_generator_uses_embeddings(mock_sentence_transformer):
-    from civicai.generator import Generator  # import inside, after patch is active
+    # FIXED: civicai -> app
+    from app.generator import Generator  # import inside, after patch is active
 
     gen = Generator()
 
