@@ -1,42 +1,26 @@
-import zlib
-from unittest.mock import MagicMock, patch
+from openai import OpenAI
+from sentence_transformers import SentenceTransformer
 
-import numpy as np
-import pytest
+from app.core.config import get_settings
+from app.services.rag.retriever import retrieve
 
-EMBEDDING_DIM = 384
+class Generator:
+    def __init__(self):
+        self.settings = get_settings()
+        self.client = OpenAI(api_key=self.settings.openai_api_key or "missing-api-key")
+        self.model = SentenceTransformer("all-MiniLM-L6-v2")
 
+    def get_answer(self, question):
+        chunks = retrieve(question)
+        context = "\n".join([c['text'] for c in chunks])
+        prompt = f"Use this context to answer the question: {context}\n\nQuestion: {question}"
 
-def _fake_encode(sentences, *args, **kwargs):
-    single = isinstance(sentences, str)
-    items = [sentences] if single else list(sentences)
-
-    vectors = np.stack([
-        np.random.default_rng(zlib.crc32(s.encode("utf-8"))).random(
-            EMBEDDING_DIM, dtype=np.float32
+        response = self.client.chat.completions.create(
+            model=self.settings.openai_model,
+            messages=[{"role": "user", "content": prompt}]
         )
-        for s in items
-    ])
-    return vectors[0] if single else vectors
+        return response.choices[0].message.content
 
-
-@pytest.fixture
-def mock_sentence_transformer():
-    with patch("app.services.rag.generator.SentenceTransformer") as mock_cls:
-        mock_model = MagicMock(name="SentenceTransformerInstance")
-        mock_model.encode.side_effect = _fake_encode
-        mock_model.get_sentence_embedding_dimension.return_value = EMBEDDING_DIM
-        mock_cls.return_value = mock_model
-        yield mock_cls
-
-
-def test_generator_uses_embeddings(mock_sentence_transformer):
-    from app.services.rag.generator import Generator
-
+if __name__ == "__main__":
     gen = Generator()
-
-    mock_sentence_transformer.assert_called_once()
-
-    emb = gen.model.encode(["pothole on Main St", "broken streetlight"])
-    assert emb.shape == (2, EMBEDDING_DIM)
-    assert emb.dtype == np.float32
+    print(gen.get_answer("Who is eligible for this scheme?"))
