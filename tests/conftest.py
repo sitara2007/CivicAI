@@ -5,6 +5,7 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
+
 from app.api.deps import get_db_session
 from app.core.config import get_settings
 from app.db.models import Decision, Document, DocumentStatus

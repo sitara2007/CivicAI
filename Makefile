@@ -7,8 +7,8 @@ test:
 	uv run python -m pytest tests/ -v
 
 fix:
-	ruff check . --fix
-
+	uv run ruff check . --fix
+	
 push: test
 	git add .
 	git commit -m "chore: automated commit" || true

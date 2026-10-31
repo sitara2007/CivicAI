@@ -1,11 +1,12 @@
-import sys
 import os
+import sys
 
 # Ye line tumhare 'civicos' folder ko Python path mein add kar degi
 # taaki 'app.services.rag.loader' ko access kar sakein
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
 from app.services.rag.loader import load_pdf
+
 
 def chunk_text(text, chunk_size=500, overlap=100):
     chunks = []

@@ -6,7 +6,7 @@ import asyncio
 import logging
 import time
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,8 +20,8 @@ from app.schemas.process import (
     ProcessRequest,
     ProcessResponse,
 )
-from app.services.pipeline import PipelineService
 from app.services.audit.chain_store import AuditChainError, audit_store
+from app.services.pipeline import PipelineService
 
 router = APIRouter(prefix="/api/v1", tags=["process"])
 logger = logging.getLogger(__name__)
@@ -88,7 +88,7 @@ async def process_document(
             },
         )
 
-    created_at = datetime.now(timezone.utc)
+    created_at = datetime.now(UTC)
     audit_hash: str | None = None
     if result.status == "completed" and result.decision is not None and result.redacted_text is not None:
         audit_payload = {

@@ -20,7 +20,7 @@ def _fake_encode(sentences, *args, **kwargs):
 
 @pytest.fixture
 def mock_sentence_transformer():
-    # Yahan create=True add kar diya gaya hai, jo error ko khatam karega
+
     with patch("app.services.rag.generator.SentenceTransformer", create=True) as mock_cls:
         mock_model = MagicMock(name="SentenceTransformerInstance")
         mock_model.encode.side_effect = _fake_encode

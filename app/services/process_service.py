@@ -8,6 +8,7 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.db.repositories.document_repo import DocumentRepository
 from app.schemas.process import (
     DecisionOutput,
     DocumentCategory,
@@ -16,7 +17,6 @@ from app.schemas.process import (
     SourceType,
 )
 from app.services.pipeline import PipelineResult, PipelineService
-from app.db.repositories.document_repo import DocumentRepository
 
 logger = logging.getLogger(__name__)
 

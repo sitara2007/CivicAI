@@ -3,10 +3,9 @@
 Handles incoming document triage requests and enqueues them for processing.
 """
 
-from typing import Dict, Any
-from app.services.workers.background import BackgroundTaskWorker
 from app.services.pii.analyzer import PIIAnalyzer
 from app.services.pipeline.validation import DocumentValidator
+from app.services.workers.background import BackgroundTaskWorker
 
 
 class DocumentPipeline:

@@ -6,8 +6,8 @@ from qdrant_client.models import PointStruct
 from sentence_transformers import SentenceTransformer
 
 from app.core.config import get_settings
-from app.services.rag.loader import load_pdf
 from app.services.rag.chunker import chunk_text
+from app.services.rag.loader import load_pdf
 
 logger = logging.getLogger(__name__)
 

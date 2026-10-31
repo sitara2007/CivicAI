@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List
+
 
 class PIIAnalyzer:
     """Detects and masks PII in documents using regex patterns."""
@@ -11,7 +11,7 @@ class PIIAnalyzer:
     }
 
     @classmethod
-    def detect_pii(cls, text: str) -> Dict[str, List[str]]:
+    def detect_pii(cls, text: str) -> dict[str, list[str]]:
         pii_found = {}
         for pii_type, pattern in cls.PII_PATTERNS.items():
             matches = re.findall(pattern, text)
