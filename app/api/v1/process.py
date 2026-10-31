@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import time
 import uuid
@@ -20,7 +19,8 @@ from app.schemas.process import (
     ProcessRequest,
     ProcessResponse,
 )
-from app.services.audit.chain_store import AuditChainError, audit_store
+# NAYA IMPORT: PostgresAuditStore
+from app.services.audit.postgres_store import PostgresAuditStore
 from app.services.pipeline import PipelineService
 
 router = APIRouter(prefix="/api/v1", tags=["process"])
@@ -90,6 +90,7 @@ async def process_document(
 
     created_at = datetime.now(UTC)
     audit_hash: str | None = None
+
     if result.status == "completed" and result.decision is not None and result.redacted_text is not None:
         audit_payload = {
             "trace_id": str(trace_id),
@@ -99,12 +100,22 @@ async def process_document(
             "decision": result.decision.model_dump(mode="json"),
             "created_at": created_at.isoformat(),
         }
+
         try:
-            entry = await asyncio.to_thread(audit_store.append, audit_payload)
-        except (AuditChainError, OSError, TypeError, ValueError) as exc:
+            # YAHAN CHANGE HUA HAI: DB Store use karo agar session hai
+            if session is not None:
+                db_audit_store = PostgresAuditStore(session)
+                entry = await db_audit_store.append(audit_payload)
+            else:
+                # Fallback for tests (without DB)
+                from app.services.audit.chain_store import audit_store
+                import asyncio
+                entry = await asyncio.to_thread(audit_store.append, audit_payload)
+
+            audit_hash = entry.hash
+        except Exception as exc:
             logger.error("audit_chain_append_failed", extra={"trace_id": str(trace_id), "error": str(exc)})
             raise HTTPException(status_code=500, detail="Audit record could not be written") from exc
-        audit_hash = entry.hash
 
     return ProcessResponse(
         trace_id=trace_id,

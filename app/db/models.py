@@ -8,6 +8,9 @@ from enum import StrEnum
 from typing import Any
 from uuid import UUID, uuid4
 
+from sqlalchemy import Integer, String, JSON
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
 from app.schemas.process import SourceType
 
 
@@ -60,3 +63,13 @@ class AuditLog:
     event_metadata: dict[str, Any]
     prev_hash: str
     timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
+class Base(DeclarativeBase):
+    pass
+
+class SQLAuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    sequence: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
+    prev_hash: Mapped[str] = mapped_column(String, nullable=False)
+    payload: Mapped[dict] = mapped_column(JSON, nullable=False)
+    hash: Mapped[str] = mapped_column(String, nullable=False)
