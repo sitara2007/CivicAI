@@ -55,13 +55,6 @@ def no_hf_network(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
-def isolate_audit_chain(tmp_path, monkeypatch):
-    from app.api.v1 import process
-
-    monkeypatch.setattr(process, "audit_store", JSONLAuditStore(tmp_path / "audit-chain.jsonl"))
-
-
-@pytest.fixture(autouse=True)
 def no_database_connection(monkeypatch):
     class _InMemorySession:
         def __init__(self):
