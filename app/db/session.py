@@ -15,6 +15,12 @@ def _get_session_factory(
     database_url: str,
     environment: str,
 ) -> async_sessionmaker[AsyncSession]:
+    # GOD-LEVEL FIX: Ensure the URL uses the asyncpg driver
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql+asyncpg://", 1)
+    elif database_url.startswith("postgresql://") and "+asyncpg" not in database_url:
+        database_url = database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
     engine = create_async_engine(database_url, echo=environment == "development")
     return async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
