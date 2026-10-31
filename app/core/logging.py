@@ -7,7 +7,7 @@ import importlib.util
 import json
 import sys
 import sysconfig
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
 
@@ -71,7 +71,7 @@ class JsonFormatter(LoggingFormatter):
 
     def format(self, record: LoggingLogRecord) -> str:
         payload: dict[str, Any] = {
-            "timestamp": datetime.fromtimestamp(record.created, tz=timezone.utc).isoformat(),
+            "timestamp": datetime.fromtimestamp(record.created, tz=UTC).isoformat(),
             "level": record.levelname,
             "logger": record.name,
             "message": record.getMessage(),

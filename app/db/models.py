@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 from uuid import UUID, uuid4
@@ -32,7 +32,7 @@ class Document:
     raw_text: str = ""
     source_type: SourceType = SourceType.TEXT
     status: DocumentStatus = DocumentStatus.RECEIVED
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 @dataclass
@@ -48,7 +48,7 @@ class Decision:
     summary: str = ""
     hop_count: int = 0
     requires_review: bool = False
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 @dataclass
@@ -59,4 +59,4 @@ class AuditLog:
     action: AuditAction
     event_metadata: dict[str, Any]
     prev_hash: str
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))

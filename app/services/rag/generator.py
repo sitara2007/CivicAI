@@ -4,6 +4,7 @@ from sentence_transformers import SentenceTransformer
 from app.core.config import get_settings
 from app.services.rag.retriever import retrieve
 
+
 class Generator:
     def __init__(self):
         self.settings = get_settings()

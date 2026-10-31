@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
+from sentence_transformers import SentenceTransformer
+
 from app.core.config import get_settings
 
 

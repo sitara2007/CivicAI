@@ -50,3 +50,17 @@ asyncio_default_fixture_loop_scope = "function"
 markers = [
     "benchmark: marks tests as benchmarks (deselect with '-m \"not benchmark\"')",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.17.3",
+]
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+# B008: FastAPI Depends() is standard, ignore it.
+# BLE001: We need broad exception handling for fallback mechanisms.
+# ASYNC230: Temp fix until aiofiles is implemented.
+ignore = ["B008", "BLE001", "ASYNC230"]

@@ -4,8 +4,8 @@ Handles heavy document triage workloads non-blockingly.
 """
 
 import asyncio
-from typing import Any, Dict, Optional
 import json
+from typing import Any
 
 from app.services.audit.audit_services import AuditLogger
 
@@ -22,7 +22,7 @@ class BackgroundTaskWorker:
         self.queue_name = queue_name
         self.logger = AuditLogger(__name__)
 
-    async def enqueue_task(self, task_data: Dict[str, Any]) -> str:
+    async def enqueue_task(self, task_data: dict[str, Any]) -> str:
         """Add a new document triage task to the queue.
 
         Args:
@@ -44,10 +44,10 @@ class BackgroundTaskWorker:
                 try:
                     await self._process_single_task(task)
                 except Exception as e:
-                    self.logger.error(f'Error processing task {task.id}: {str(e)}')
+                    self.logger.error(f'Error processing task {task.id}: {e!s}')
             await asyncio.sleep(1)
 
-    async def _process_single_task(self, task: Dict[str, Any]) -> None:
+    async def _process_single_task(self, task: dict[str, Any]) -> None:
         """Handle individual document processing task."""
         self.logger.info(f'Processing task {task.get("id")}')
         document_content = task.get('content')
@@ -63,7 +63,7 @@ class BackgroundTaskWorker:
         from uuid import uuid4
         return str(uuid4())
 
-    async def _store_task(self, task_id: str, task_data: Dict[str, Any]) -> None:
+    async def _store_task(self, task_id: str, task_data: dict[str, Any]) -> None:
         """Store task data in persistent storage."""
         try:
             # Use Redis or a database to store the task
@@ -72,9 +72,9 @@ class BackgroundTaskWorker:
             redis_client.set(task_id, json.dumps(task_data))
             self.logger.info(f'Stored task {task_id} in Redis')
         except Exception as e:
-            self.logger.error(f'Failed to store task {task_id}: {str(e)}')
+            self.logger.error(f'Failed to store task {task_id}: {e!s}')
 
-    async def _fetch_pending_tasks(self) -> list[Dict[str, Any]]:
+    async def _fetch_pending_tasks(self) -> list[dict[str, Any]]:
         """Retrieve pending tasks from storage."""
         try:
             import redis
@@ -87,7 +87,7 @@ class BackgroundTaskWorker:
             self.logger.info(f'Fetched {len(tasks)} pending tasks from Redis')
             return tasks
         except Exception as e:
-            self.logger.error(f'Failed to fetch pending tasks: {str(e)}')
+            self.logger.error(f'Failed to fetch pending tasks: {e!s}')
             return []
 
 

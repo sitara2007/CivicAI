@@ -1,6 +1,8 @@
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any
+
 import magic
+
 
 class DocumentValidator:
     """Validates incoming document structure and size limits."""
@@ -13,7 +15,7 @@ class DocumentValidator:
     MAX_FILE_SIZE_MB = 10
 
     @classmethod
-    def validate_file(cls, file_path: str) -> Dict[str, Any]:
+    def validate_file(cls, file_path: str) -> dict[str, Any]:
         path = Path(file_path)
         if not path.exists():
             return {"valid": False, "error": "File not found"}
