@@ -6,7 +6,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-# FIX: AuditLog (dataclass) ki jagah SQLAuditLog (database model) import karo
+# Yahan SQLAuditLog import hona chahiye
 from app.db.models import SQLAuditLog
 from app.services.audit.chain_store import AuditEntry, VerificationResult
 from app.services.audit.hash_chain import GENESIS_HASH, compute_prev_hash
@@ -17,7 +17,7 @@ class PostgresAuditStore:
         self._session = session
 
     async def append(self, payload: dict[str, Any]) -> AuditEntry:
-        # FIX: SQLAuditLog use karo
+        # Yahan SQLAuditLog use hona chahiye
         stmt = select(SQLAuditLog).order_by(SQLAuditLog.sequence.desc()).limit(1)
         result = await self._session.execute(stmt)
         last_entry = result.scalar_one_or_none()
@@ -28,7 +28,6 @@ class PostgresAuditStore:
         chain_data = {"prev_hash": prev_hash, "payload": payload}
         entry_hash = compute_prev_hash(chain_data)
 
-        # FIX: SQLAuditLog instance banao
         new_log = SQLAuditLog(
             sequence=sequence,
             prev_hash=prev_hash,
@@ -47,7 +46,6 @@ class PostgresAuditStore:
         )
 
     async def verify(self) -> VerificationResult:
-        # FIX: SQLAuditLog use karo
         stmt = select(SQLAuditLog).order_by(SQLAuditLog.sequence.asc())
         result = await self._session.execute(stmt)
         logs = result.scalars().all()
