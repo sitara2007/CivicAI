@@ -58,7 +58,7 @@ class Settings(BaseSettings):
     max_input_tokens: int = 8000
     max_document_tokens: int = 10_000
     sync_mode: bool = True  # Phase 1-4: sync; Phase 5+: set False
-    mock_llm: bool = False  # set MOCK_LLM=true for offline demo / CI
+    mock_llm: bool = True  # Set to True for mock responses
 
     @property
     def use_mock_llm(self) -> bool:
