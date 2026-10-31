@@ -13,6 +13,10 @@ from app.api.router import api_router
 from app.core.config import get_settings
 from app.core.logging import configure_logging
 
+# YAHAN NAYE IMPORTS HAIN:
+from app.db.session import engine
+from app.db.models import Base
+
 logger = logging.getLogger("app.main")
 
 def validate_required_environment() -> None:
@@ -34,6 +38,17 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Manage application startup and shutdown concerns."""
     validate_required_environment()
     settings = get_settings()
+
+    # GOD-LEVEL FIX: Tables khud banao server start hote hi
+    if settings.database_enabled:
+        try:
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            logger.info("database_tables_verified_and_created")
+        except Exception as e:
+            logger.error(f"database_initialization_failed: {e}")
+            raise e # Server ko crash hone do taaki pata chale
+
     logger.info(
         "application_starting",
         extra={
@@ -60,7 +75,7 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # EXCEPTION HANDLER (Yahan lagana tha!)
+    # EXCEPTION HANDLER
     @application.exception_handler(Exception)
     async def global_exception_handler(request: Request, exc: Exception):
         return JSONResponse(
