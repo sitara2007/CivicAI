@@ -1,7 +1,7 @@
 import sys
 import types
 import zlib
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, AsyncMock
 
 import numpy as np
 import pytest
@@ -10,13 +10,12 @@ from app.api.deps import get_db_session
 from app.core.config import get_settings
 from app.db.models import Decision, Document, DocumentStatus
 from app.main import app
-from app.services.audit.chain_store import JSONLAuditStore
+from app.services.audit.chain_store import AuditEntry
 
-EMBEDDING_DIM = 384  # all-MiniLM-L6-v2; change if you use another model
+EMBEDDING_DIM = 384
 
 
 def _fake_encode(sentences, *args, **kwargs):
-    """Deterministic dummy embeddings (crc32, not hash(), which is salted per run)."""
     single = isinstance(sentences, str)
     items = [sentences] if single else list(sentences)
     vectors = np.stack([
@@ -35,8 +34,6 @@ def _make_fake_model(*args, **kwargs):
     return model
 
 
-# Install the stub BEFORE any test module imports app.services.rag.retriever.
-# Always stubbed, so CI never needs torch or the 2GB model, even if installed locally.
 _stub = types.ModuleType("sentence_transformers")
 _stub.SentenceTransformer = MagicMock(side_effect=_make_fake_model)
 sys.modules["sentence_transformers"] = _stub
@@ -55,6 +52,29 @@ def no_hf_network(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def mock_postgres_audit_store(monkeypatch):
+    from app.api.v1 import process
+
+    mock_store = AsyncMock()
+
+    # YAHAN FIX HUA HAI: 64 characters ka fake hash banaya (SHA-256 length)
+    fake_64_hash = "a" * 64
+
+    mock_store.append.return_value = AuditEntry(
+        sequence=1,
+        prev_hash="genesis",
+        payload={},
+        hash=fake_64_hash
+    )
+
+    monkeypatch.setattr(
+        process,
+        "PostgresAuditStore",
+        lambda session: mock_store
+    )
+
+
+@pytest.fixture(autouse=True)
 def no_database_connection(monkeypatch):
     class _InMemorySession:
         def __init__(self):
@@ -69,9 +89,7 @@ def no_database_connection(monkeypatch):
         def __init__(self, session):
             self._session = session
 
-        async def create_document(
-            self, *, document_id, trace_id, raw_text, source_type
-        ):
+        async def create_document(self, *, document_id, trace_id, raw_text, source_type):
             self._session.documents[document_id] = Document(
                 id=document_id,
                 trace_id=trace_id,
@@ -82,9 +100,7 @@ def no_database_connection(monkeypatch):
         async def mark_processing(self, document_id):
             self._session.documents[document_id].status = DocumentStatus.PROCESSING
 
-        async def save_redacted(
-            self, *, document_id, trace_id, redacted_text, entity_count
-        ):
+        async def save_redacted(self, *, document_id, trace_id, redacted_text, entity_count):
             self._session.entity_counts[trace_id] = entity_count
 
         async def save_decision(
@@ -111,9 +127,7 @@ def no_database_connection(monkeypatch):
             )
             self._session.documents[document_id].status = DocumentStatus.COMPLETED
 
-        async def mark_dlq(
-            self, *, document_id, trace_id, reason, hop_count
-        ):
+        async def mark_dlq(self, *, document_id, trace_id, reason, hop_count):
             self._session.documents[document_id].status = DocumentStatus.DLQ
 
         async def get_document_with_decision(self, trace_id):
