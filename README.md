@@ -1,4 +1,6 @@
-# CivicAI
+## 🚀 Live Demo
+- **Frontend UI:** [https://civicai-frontend-fkpxdqto1-pishu97823-3101.vercel.app](https://civicai-frontend-fkpxdqto1-pishu97823-3101.vercel.app)
+- **Backend API Docs:** [https://civicai-backend-hb5e.onrender.com/docs](https://civicai-backend-hb5e.onrender.com/docs)# CivicAI
 
 **AI workflow engine for government and public-sector document triage, classification and routing, with PII redaction and a tamper-evident audit trail.**
 **Replaces multi-day manual government document sorting with sub-second automated triage and tamper-proof auditing.**
