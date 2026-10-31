@@ -141,5 +141,3 @@ def _parse_chain(contents: bytes) -> tuple[list[dict[str, Any]], VerificationRes
 
     return records, VerificationResult(ok=True, entries=len(records), message="chain valid")
 
-
-audit_store: AuditStore = JSONLAuditStore(Path("data/audit-chain.jsonl"))
