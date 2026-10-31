@@ -3,7 +3,7 @@ import re
 
 class PIIAnalyzer:
     """Detects and masks PII in documents using regex patterns."""
-    
+
     PII_PATTERNS = {
         "PHONE": r"\b(?:\+?91|0)?[6-9]\d{9}\b",
         "EMAIL": r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b",
