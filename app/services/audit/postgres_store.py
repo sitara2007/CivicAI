@@ -3,7 +3,7 @@ from __future__ import annotations
 import hmac
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 # Yahan SQLAuditLog import hona chahiye
@@ -17,7 +17,9 @@ class PostgresAuditStore:
         self._session = session
 
     async def append(self, payload: dict[str, Any]) -> AuditEntry:
-        # Yahan SQLAuditLog use hona chahiye
+        await self._session.execute(
+            text("SELECT pg_advisory_xact_lock(8675309)")
+        )
         stmt = select(SQLAuditLog).order_by(SQLAuditLog.sequence.desc()).limit(1)
         result = await self._session.execute(stmt)
         last_entry = result.scalar_one_or_none()

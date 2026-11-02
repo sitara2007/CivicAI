@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db_session
 from app.schemas.process import DocumentCategory, HistoryItem, HistoryResponse, Priority
-from app.services.repository import DocumentRepository
+from app.db.repositories.document_repo import DocumentRepository
 
 router = APIRouter(prefix="/api/v1", tags=["history"])
 
