@@ -21,4 +21,5 @@ If someone edits `entry[k].payload`, its recomputed hash no longer equals its st
 **128-byte payload limit:** This limit is for metadata only (e.g., document ID, file hash). Real documents must be stored in object storage.
 **Signature not verified:** `Sig` is stored as bytes but never verified against a public key. The hash chain proves sequence integrity, but not authenticity.
 **Schema is fixed and inconsistent:** `[24]byte`, `[64]byte` are compiled into the struct. Also, `TenantID` and `Source` lack explicit length fields (unlike `EventTypeN`, etc.), relying on trimming which is error-prone.
+**Truncated UUID Flaw:** `bench_test.go` uses a 23-character truncated UUID for `tenant_id`. A real UUID is 36 characters. The validation logic (line 265 in `cmd/ingest/main.go`) rejects anything over 24 bytes. This is a potential design mismatch that needs a decision: either expand the array limit or standardise on shorter IDs.
 **Timestamp not trusted:** `TS` is wall-clock time from the writer and can be spoofed.

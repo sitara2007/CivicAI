@@ -40,15 +40,15 @@ Changing any past record invalidates all later hashes.
 
 ## Benchmarks
 
-Measured on an Intel i5-13420H (12 cores, WSL2), 2026-09-28. Full details and reproduce commands: [BENCHMARKS.md](./BENCHMARKS.md).
+Measured on an Intel i5-13420H (12 cores, WSL2), 2026-11-02. Full details and reproduce commands: [BENCHMARKS.md](./BENCHMARKS.md).
 
-**Hash chain (Python 3.12, pytest-benchmark, single-threaded)**
+**Hash chain (Python 3.12.14, pytest-benchmark, single-threaded)**
 
 | Operation | Median | Throughput |
 |---|---|---|
-| genesis_hash | 261 ns | 2.58 M ops/s |
-| compute_prev_hash (3 keys) | 4.37 µs | 116,175 ops/s |
-| compute_prev_hash (100+ elements) | 10.17 µs | 74,184 ops/s |
+| genesis_hash | 86.1 ns | 11.6 M ops/s |
+| compute_prev_hash (3 keys) | 3.13 µs | 318,471 ops/s |
+| compute_prev_hash (100+ elements) | 7.42 µs | 134,770 ops/s |
 
 **Go ingest path (Go 1.26.0)**
 
