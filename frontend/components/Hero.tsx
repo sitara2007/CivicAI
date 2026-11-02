@@ -7,7 +7,7 @@ export function Hero() {
   const [status, setStatus] = useState<"online" | "down" | "loading">("loading");
   useEffect(() => {
     let mounted = true;
-    fetch("https://civicos-480a.onrender.com/health")
+    fetch("https://civicai-backend-hb5e.onrender.com/health")
       .then((r) => mounted && setStatus(r.ok ? "online" : "down"))
       .catch(() => mounted && setStatus("down"));
     return () => { mounted = false; };

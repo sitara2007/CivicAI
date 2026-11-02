@@ -10,7 +10,7 @@ export function LiveDemo() {
     if (!text.trim()) return;
     setLoading(true); setError(""); setResult("");
     try {
-      const res = await fetch("https://civicos-480a.onrender.com/api/v1/process", {
+      const res = await fetch("https://civicai-backend-hb5e.onrender.com/api/v1/process", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
       });

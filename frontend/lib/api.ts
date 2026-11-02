@@ -1,4 +1,4 @@
-export const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "https://civicos-480a.onrender.com";
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "https://civicai-backend-hb5e.onrender.com";
 
 export type SourceType = "text" | "pdf" | "form";
 
