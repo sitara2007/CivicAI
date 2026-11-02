@@ -11,6 +11,22 @@ name: CI
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: civicai
+          POSTGRES_PASSWORD: civicai
+          POSTGRES_DB: civicai
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U civicai"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql+asyncpg://civicai:civicai@127.0.0.1:5432/civicai
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
