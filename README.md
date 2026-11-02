@@ -22,7 +22,7 @@
 | Frontend | Next.js (App Router) | `frontend/` |
 | Ingestion + mTLS | Go | `cmd/ingest/`, `internal/middleware/` |
 | Classification / routing | Python FastAPI with optional RAG | `app/`, `python-rag-service/` |
-| Database | Async SQLAlchemy/PostgreSQL; no PostgreSQL DDL or Alembic migration scripts are checked in | `app/db/`, `alembic.ini` |
+| Database | Async SQLAlchemy/PostgreSQL; tables (`documents`, `decisions`, `audit_logs`) are created at startup via `Base.metadata.create_all`; Alembic migrations are not set up yet | `app/db/` |
 | Evaluation | Python | `eval/` |
 | Tests | pytest and Go test; embeddings and database are stubbed in Python tests | `tests/` |
 
@@ -37,6 +37,10 @@ entry[n].hash = H(entry[n].payload || entry[n-1].hash)
 ```
 
 Changing any past record invalidates all later hashes.
+
+**Limitations:**
+- `verify()` detects edits to stored rows. It does not detect someone who recomputes and rewrites the whole chain, or deletes trailing rows, because there is no external anchor for the latest hash.
+- Appends are serialized with a PostgreSQL advisory lock (`pg_advisory_xact_lock`), which has been tested with 20 parallel appends but not under sustained production load.
 
 ## Benchmarks
 
@@ -70,7 +74,7 @@ These are component performance benchmarks, not model-quality metrics. No classi
 
 ## Testing and quality
 
-CI runs `uv sync --extra dev --extra rag`, `uv run pytest -q`, and `go test ./...` under Python 3.12. Python tests use deterministic embedding stubs and an in-memory database repository; they do not test against PostgreSQL. The real Presidio backend is not exercised in CI because its default analyzer requires the spaCy `en_core_web_lg` model download. CI tests the regex fallback instead.
+CI runs `uv sync --extra dev --extra rag`, `uv run pytest -q`, and `go test ./...` under Python 3.12. Most Python tests use deterministic embedding stubs and an in-memory database repository. Two tests in `tests/test_audit_postgres.py` run against a real PostgreSQL instance: tamper detection (editing a stored payload makes `verify()` fail with a hash mismatch) and concurrent-append safety (20 parallel appends keep the chain valid). Removing the advisory lock in `PostgresAuditStore.append` makes the concurrency test fail with a primary-key `UniqueViolationError`. These tests `TRUNCATE audit_logs`, so run them only against a dev database. They need a reachable PostgreSQL; whether they run or skip in CI has not been verified. The real Presidio backend is not exercised in CI because its default analyzer requires the spaCy `en_core_web_lg` model download. CI tests the regex fallback instead.
 
 ## Run locally
 
@@ -111,6 +115,11 @@ uv sync --extra dev --extra rag
 ## Status
 
 - [x] Python Pipeline (Redaction, Classification, Audit Chain)
+- [x] PostgreSQL persistence for `/api/v1/process` (documents, decisions, audit log), verified manually end to end
+- [x] Real-PostgreSQL tests for audit tamper detection and concurrent appends
+- [ ] `/api/v1/history` endpoint (repository `list_history` method missing)
+- [ ] CI with a PostgreSQL service
+- [ ] Alembic migrations
 - [x] Go Service (Ingestion)
 - [ ] **End-to-End Integration** (Go ingest currently decoupled from Python audit chain)
 - [ ] Verify Vercel and Railway deployment status
