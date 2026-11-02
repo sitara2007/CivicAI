@@ -50,12 +50,12 @@ Measured on an Intel i5-13420H (12 cores, WSL2), 2026-11-02. Full details and re
 | compute_prev_hash (3 keys) | 3.13 µs | 318,471 ops/s |
 | compute_prev_hash (100+ elements) | 7.42 µs | 134,770 ops/s |
 
-**Go ingest path (Go 1.26.0)**
+**Go ingest path (Go 1.26.0, 2026-11-02)**
 
 | Benchmark | ns/op | allocs/op | Throughput |
 |---|---|---|---|
-| EventQueuePublish | 32.68 | 0 | 30.6 M ops/s |
-| AppendEventJSON | 724.3 | 7 | 1.38 M ops/s |
+| EventQueuePublish | 30.62 | 0 | 32.7 M ops/s |
+| AppendEventJSON | 841.9 | 7 | 1.2 M ops/s |
 
 **Limitations:** these are micro-benchmarks of individual components, not end-to-end request throughput. `DecodeEvent`: 4,581 ns/op median, 600 B/op, 12 allocs/op (3 runs; Go 1.26.0, WSL2). Outliers up to 9.6 ms were observed (GC/scheduling).
 
