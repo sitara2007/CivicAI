@@ -9,6 +9,7 @@ from typing import Any
 from uuid import UUID, uuid4
 
 from sqlalchemy import Integer, String, JSON
+from sqlalchemy import Boolean, DateTime, Float, Text, func, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from app.schemas.process import SourceType
@@ -73,3 +74,41 @@ class SQLAuditLog(Base):
     prev_hash: Mapped[str] = mapped_column(String, nullable=False)
     payload: Mapped[dict] = mapped_column(JSON, nullable=False)
     hash: Mapped[str] = mapped_column(String, nullable=False)
+
+class SQLDocument(Base):
+    __tablename__ = "documents"
+
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    trace_id: Mapped[UUID] = mapped_column(nullable=False, index=True)
+    raw_text: Mapped[str] = mapped_column(Text, nullable=False)
+    redacted_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    source_type: Mapped[str] = mapped_column(String, nullable=False)
+    status: Mapped[str] = mapped_column(String, nullable=False)
+    pii_entities_masked: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    dlq_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    hop_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+
+class SQLDecision(Base):
+    __tablename__ = "decisions"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    document_id: Mapped[UUID] = mapped_column(nullable=False, index=True)
+    trace_id: Mapped[UUID] = mapped_column(nullable=False)
+    category: Mapped[str] = mapped_column(String, nullable=False)
+    priority: Mapped[str] = mapped_column(String, nullable=False)
+    department: Mapped[str] = mapped_column(String, nullable=False, default="")
+    confidence: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    decision_rationale: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    summary: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    hop_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    requires_review: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    latency_ms: Mapped[float | None] = mapped_column(Float, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
