@@ -39,15 +39,16 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     validate_required_environment()
     settings = get_settings()
 
-    # GOD-LEVEL FIX: Tables khud banao server start hote hi
+    # Create tables; never crash on DB init failure — serve degraded instead.
     if settings.database_enabled:
+        import asyncio as _asyncio
         try:
-            async with engine.begin() as conn:
-                await conn.run_sync(Base.metadata.create_all)
+            async with _asyncio.timeout(20):
+                async with engine.begin() as conn:
+                    await conn.run_sync(Base.metadata.create_all)
             logger.info("database_tables_verified_and_created")
         except Exception as e:
-            logger.error(f"database_initialization_failed: {e}")
-            raise e # Server ko crash hone do taaki pata chale
+            logger.error(f"database_initialization_failed: {e} — degraded mode, /health will still serve")
 
     logger.info(
         "application_starting",
