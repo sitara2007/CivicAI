@@ -42,7 +42,7 @@ Changing any past record invalidates all later hashes.
 
 Measured on an Intel i5-13420H (12 cores, WSL2), 2026-09-28. Full details and reproduce commands: [BENCHMARKS.md](./BENCHMARKS.md).
 
-**Hash chain (Python 3.14.4, pytest-benchmark, single-threaded)**
+**Hash chain (Python 3.12, pytest-benchmark, single-threaded)**
 
 | Operation | Median | Throughput |
 |---|---|---|
@@ -70,11 +70,11 @@ These are component performance benchmarks, not model-quality metrics. No classi
 
 ## Testing and quality
 
-CI runs `uv sync --extra dev` and `uv run pytest -q`. Python tests use deterministic embedding stubs and an in-memory database repository; they do not test against PostgreSQL. The real Presidio backend is not exercised in CI because its default analyzer requires the spaCy `en_core_web_lg` model download. CI tests the regex fallback instead.
+CI runs `uv sync --extra dev --extra rag`, `uv run pytest -q`, and `go test ./...` under Python 3.12. Python tests use deterministic embedding stubs and an in-memory database repository; they do not test against PostgreSQL. The real Presidio backend is not exercised in CI because its default analyzer requires the spaCy `en_core_web_lg` model download. CI tests the regex fallback instead.
 
 ## Run locally
 
-### With Docker (Python API & Infrastructure only)
+### With Docker (Python API & Infrastructure only - ⚠️ Unverified locally)
 *Note: The `docker-compose.yml` starts PostgreSQL, Qdrant, Redis, the FastAPI service, and the Celery worker. The Go ingestion service (`cmd/ingest`) is **not** included in the compose file and must be run separately as a binary.*
 
 ```bash
@@ -87,6 +87,7 @@ docker compose up --build
 Without Docker:
 
 ```bash
+cp .env.example .env
 uv sync --extra dev
 uv run pytest -q       # Runs Python tests
 
@@ -109,7 +110,9 @@ uv sync --extra dev --extra rag
 
 ## Status
 
-- [x] Ingestion, redaction, classification, audit chain
+- [x] Python Pipeline (Redaction, Classification, Audit Chain)
+- [x] Go Service (Ingestion)
+- [ ] **End-to-End Integration** (Go ingest currently decoupled from Python audit chain)
 - [ ] Verify Vercel and Railway deployment status (not verifiable from checked-in configuration)
 - [x] Go `DecodeEvent` microbenchmark recorded
 - [ ] End-to-end throughput and latency benchmark
