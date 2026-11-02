@@ -85,7 +85,10 @@ Without Docker:
 
 ```bash
 uv sync --extra dev
-uv run pytest -q
+uv run pytest -q       # Runs Python tests
+
+go build ./...         # Compiles the Go ingestion service
+go test ./...          # Runs Go tests
 ```
 
 To install the optional RAG dependencies as well:
