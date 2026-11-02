@@ -12,6 +12,9 @@ from app.services.audit.postgres_store import PostgresAuditStore
 def _run(coro):
     async def wrapper():
         try:
+            from app.db.models import Base
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
             return await coro
         finally:
             await engine.dispose()
