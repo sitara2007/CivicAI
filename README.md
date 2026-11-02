@@ -113,7 +113,7 @@ uv sync --extra dev --extra rag
 - [x] Python Pipeline (Redaction, Classification, Audit Chain)
 - [x] Go Service (Ingestion)
 - [ ] **End-to-End Integration** (Go ingest currently decoupled from Python audit chain)
-- [ ] Verify Vercel and Railway deployment status (not verifiable from checked-in configuration)
+- [ ] Verify Vercel and Railway deployment status
 - [x] Go `DecodeEvent` microbenchmark recorded
 - [ ] End-to-end throughput and latency benchmark
 - [ ] Review dependency alerts (current status not verified)
