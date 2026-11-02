@@ -74,6 +74,9 @@ CI runs `uv sync --extra dev` and `uv run pytest -q`. Python tests use determini
 
 ## Run locally
 
+### With Docker (Python API & Infrastructure only)
+*Note: The `docker-compose.yml` starts PostgreSQL, Qdrant, Redis, the FastAPI service, and the Celery worker. The Go ingestion service (`cmd/ingest`) is **not** included in the compose file and must be run separately as a binary.*
+
 ```bash
 git clone https://github.com/sitara2007/CivicAI.git
 cd CivicAI
