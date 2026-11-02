@@ -117,7 +117,7 @@ uv sync --extra dev --extra rag
 - [x] Python Pipeline (Redaction, Classification, Audit Chain)
 - [x] PostgreSQL persistence for `/api/v1/process` (documents, decisions, audit log), verified manually end to end
 - [x] Real-PostgreSQL tests for audit tamper detection and concurrent appends
-- [ ] `/api/v1/history` endpoint (repository `list_history` method missing)
+- [x] `/api/v1/history` endpoint (pagination and status filter checked manually against PostgreSQL; DLQ-positive case and automated tests not done yet)
 - [ ] CI with a PostgreSQL service
 - [ ] Alembic migrations
 - [x] Go Service (Ingestion)
