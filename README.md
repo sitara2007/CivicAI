@@ -4,7 +4,7 @@
 **Designed to reduce manual document-triage effort; end-to-end latency and audit-integrity guarantees have not been independently benchmarked.**
 [![Deploy](https://github.com/sitara2007/CivicAI/actions/workflows/deploy.yml/badge.svg)](https://github.com/sitara2007/CivicAI/actions/workflows/deploy.yml)
 
-[Live demo](https://civic-ai-gray.vercel.app) · [Benchmarks](./BENCHMARKS.md) · [Security](./SECURITY.md)
+[Live demo](https://civic-ai-nu-ten.vercel.app) · [Benchmarks](./BENCHMARKS.md) · [Security](./SECURITY.md)
 
 ---
 
