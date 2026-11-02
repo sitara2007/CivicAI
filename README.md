@@ -1,9 +1,7 @@
-## 🚀 Live Demo
-- **Frontend UI:** [https://civicai-frontend-fkpxdqto1-pishu97823-3101.vercel.app](https://civicai-frontend-fkpxdqto1-pishu97823-3101.vercel.app)
-- **Backend API Docs:** [https://civicai-backend-hb5e.onrender.com/docs](https://civicai-backend-hb5e.onrender.com/docs)# CivicAI
+# CivicAI
 
 **AI workflow engine for government and public-sector document triage, classification and routing, with PII redaction and a tamper-evident audit trail.**
-**Replaces multi-day manual government document sorting with sub-second automated triage and tamper-proof auditing.**
+**Designed to reduce manual document-triage effort; end-to-end latency and audit-integrity guarantees have not been independently benchmarked.**
 [![Deploy](https://github.com/sitara2007/CivicAI/actions/workflows/deploy.yml/badge.svg)](https://github.com/sitara2007/CivicAI/actions/workflows/deploy.yml)
 
 [Live demo](https://civic-ai-gray.vercel.app) · [Benchmarks](./BENCHMARKS.md) · [Security](./SECURITY.md)
@@ -59,7 +57,7 @@ Measured on an Intel i5-13420H (12 cores, WSL2), 2026-09-28. Full details and re
 | EventQueuePublish | 32.68 | 0 | 30.6 M ops/s |
 | AppendEventJSON | 724.3 | 7 | 1.38 M ops/s |
 
-**Limitations:** these are micro-benchmarks of individual components, not end-to-end request throughput. `DecodeEvent` benchmark is pending a fix. Outliers up to 9.6 ms were observed (GC/scheduling).
+**Limitations:** these are micro-benchmarks of individual components, not end-to-end request throughput. `DecodeEvent`: 4,581 ns/op median, 600 B/op, 12 allocs/op (3 runs; Go 1.26.0, WSL2). Outliers up to 9.6 ms were observed (GC/scheduling).
 
 Reproduce:
 
@@ -107,7 +105,7 @@ uv sync --extra dev --extra rag
 
 - [x] Ingestion, redaction, classification, audit chain
 - [ ] Verify Vercel and Railway deployment status (not verifiable from checked-in configuration)
-- [ ] Go `DecodeEvent` benchmark fix
+- [x] Go `DecodeEvent` microbenchmark recorded
 - [ ] End-to-end throughput and latency benchmark
 - [ ] Review dependency alerts (current status not verified)
 
