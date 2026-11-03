@@ -33,15 +33,16 @@ async def _truncate():
         break
 
 
-async def _append(i: int):
+async def _append(i: int) -> None:
     async for s in get_session():
-        return await PostgresAuditStore(s).append({"n": i})
-
+        await PostgresAuditStore(s).append({"n": i})
+        return  # Exit after the first iteration
+    raise RuntimeError("No database session available")
 
 async def _verify():
     async for s in get_session():
         return await PostgresAuditStore(s).verify()
-
+    raise RuntimeError("No session available") 
 
 def test_tamper_detected():
     async def run():
