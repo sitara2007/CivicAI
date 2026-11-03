@@ -14,13 +14,13 @@ dependencies = [
     "openai>=1.0",
     "pydantic>=2.7",
     "pydantic-settings>=2.2",
-    "pypdf>=4.0",
+    "pypdf>=6.0.0",
     "pybreaker>=1.0",
     "sqlalchemy[asyncio]>=2.0",
     "tenacity>=8.2",
     "uvicorn[standard]>=0.30",
     "uuid6>=2024.1.12",
-    "numpy<2.5.0", 
+    "numpy<2.5.0",
 ]
 
 [project.optional-dependencies]
