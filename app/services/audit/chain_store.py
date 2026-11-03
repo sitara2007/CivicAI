@@ -43,9 +43,7 @@ class JSONLAuditStore:
         self._path = path
 
     def append(self, payload: dict[str, Any]) -> AuditEntry:
-        serialized_payload = json.loads(
-            json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-        )
+        serialized_payload = payload  # No need to serialize and deserialize
         self._path.parent.mkdir(parents=True, exist_ok=True)
         with self._path.open("a+b") as stream:
             fcntl.flock(stream.fileno(), fcntl.LOCK_EX)
