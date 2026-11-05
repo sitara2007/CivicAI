@@ -51,6 +51,10 @@ class PipelineService:
             redacted_text, entities = sanitize(normalized)
             if persist_redacted is not None:
                 await persist_redacted(redacted_text, entities)
+
+            logger.info(
+                "pii_redacted", extra={"trace_id": str(trace_id), "entities": entities}
+            )
             logger.info(
                 "pii_redacted", extra={"trace_id": str(trace_id), "entities": entities}
             )

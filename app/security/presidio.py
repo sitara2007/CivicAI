@@ -47,6 +47,14 @@ def _regex_fallback(text: str) -> tuple[str, list[dict]]:
                     "score": 1.0,
                 }
             )
+            entities.append(
+                {
+                    "type": "REGEX",
+                    "start": match.start(),
+                    "end": match.end(),
+                    "score": 1.0,
+                }
+            )
     redacted = text
     for pattern, replacement in _REGEX_PATTERNS:
         redacted = pattern.sub(replacement, redacted)
