@@ -434,7 +434,7 @@ func redactDocumentHandler(w http.ResponseWriter, r *http.Request) {
 	go func(data []byte) {
 		client := &http.Client{Timeout: 10 * time.Second} // Python LLM call mein time leta hai
 		pythonURL := getenv("PYTHON_API_URL", "http://127.0.0.1:8000/api/v1/process")
-		
+
 		maxRetries := 3
 		for i := 0; i < maxRetries; i++ {
 			resp, err := client.Post(pythonURL, "application/json", bytes.NewBuffer(data))
@@ -446,11 +446,11 @@ func redactDocumentHandler(w http.ResponseWriter, r *http.Request) {
 				}
 				resp.Body.Close()
 			}
-			
+
 			log.Printf("Attempt %d failed for Python pipeline. Retrying...", i+1)
 			time.Sleep(2 * time.Second)
 		}
-		
+
 		// CRITICAL FALLBACK: Agar Python down hai, toh Go ka ClickHouse audit bachayega
 		log.Printf("CRITICAL: Python pipeline failed after 3 attempts. Pushing to DLQ.")
 	}(jsonPayload)

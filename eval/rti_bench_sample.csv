@@ -1,8 +1,8 @@
 filename,doc_subtype,doc_format,text_length,case_no,date_signed,exemptions_cited,penalty_inr,commissioner,date_original_order,date_adjunct,adjunct_outcome,source,rti_filed_on,cpio_replied_on,first_appeal_on,faa_order_on,second_appeal_on,date_of_hearing,rules_cited,outcome,public_authority,date_of_decision,appellant,complaint_filed
 40001.pdf,OTHER,2026,5619,,,[],,,,,,cic_pdf_batch2,,,,,,,,,,,,
 602125.pdf,ADJUNCT_COMPLIANCE,2023a,3222,CIC/CUOJK/A/2017/602125,03.03.2023,[],,AmitaPandove,20.09.2018,03.03.2023,SCN_DROPPED,cic_pdf_batch1,,,,,,,,,,,,
-2023-06-08-11021519.pdf,PRIMARY_DECISION,2023b,3267,CIC/NTSTH/C/2022/639604,,[],,Vanaja N. Sarna,,,,cic_pdf_batch2,25,11,04,,,07,"['Section \n18 of the RTI Act', 'Section 20(1) of the RTI Act']",UNKNOWN,,07,"In the matter of 
- 
+2023-06-08-11021519.pdf,PRIMARY_DECISION,2023b,3267,CIC/NTSTH/C/2022/639604,,[],,Vanaja N. Sarna,,,,cic_pdf_batch2,25,11,04,,,07,"['Section \n18 of the RTI Act', 'Section 20(1) of the RTI Act']",UNKNOWN,,07,"In the matter of
+
 Goutam Saren",
 case_15-123032_Court_Case_DONE.pdf,PRIMARY_DECISION,2026,10679,CIC/NIOPS/A/2025/123032,,"['8(1)(e)', '8(1)(j)']",,Sudha Rani Relangi,,,,cic_pdf_batch2,21,28,06,,,30,"['Section 8', 'Section \n8(1)(j)', 'Section 8(1) \nof the RTI Act', 'Section 8(1) of the RTI Act', 'Section 44', 'section 25(5) of the RTI Act']",UNKNOWN,"NATIONAL INSTITUTE OF OPEN SCHOOLING,",06,,
 6-628315.pdf,PRIMARY_DECISION,2026,5969,CIC/MOCAV/A/2025/628315,13.05.2026,[],,Ashutosh Chaturvedi,,,,cic_pdf_batch2,02/04/2025,13/05/2025,13/05/2025,,22/07/2025,13/05/2026,"['Section 7(9) of the RTI Act', 'section 25(5) of the RTI Act']",INFORMATION_DIRECTED,"Ministry of Civil Aviation, New Delhi",13/05/2026,Robin Zaccheus,
@@ -30,8 +30,8 @@ case_2-625832_DONE.pdf,PRIMARY_DECISION,2026,6876,CIC/NTAGN/A/2025/625832,,[],,S
 2019-12-10-155825107928.pdf,PRIMARY_DECISION,2023a,15514,,,[],,Bimal Julka),,,,cic_pdf_batch1,,,,,,,"['Section 8(1)', 'Section 8(3) of the\nRTI Act', 'Section 8(3) of the RTI Act', 'section 8(l)', 'section 8(3)', 'section 8 of the RTI Act', 'Section 8 of the\nRTI Act', 'Section 8(3)', 'section 3']",UNKNOWN,,,,
 2026-05-13-172726615996.pdf,PRIMARY_DECISION,2026,5335,CIC/NMCOM/A/2025/615996,,[],,Jaya Varma Sinha,,,,cic_pdf_batch2,03,28,01,,,11,['section 25(5) of the RTI Act'],APPEAL_DISMISSED,"National Medical Commission,",13,,
 606021.pdf,PRIMARY_DECISION,2026,6168,CIC/DHEDU/C/2025/606021,,[],,Jaya Varma Sinha,,,,cic_pdf_batch2,27,,28,,,21,"['Section 18 of the RTI Act', 'Section 18', 'Section 19', 'Section 7', 'Section 20', 'section 25(5) of the RTI Act']",UNKNOWN,NATIONAL PROJECT,22,,
-2023-06-16-12482510_-_20.pdf,PRIMARY_DECISION,2023b,14785,CIC/CHRDG/C/2022/653614,,[],,,,,,cic_pdf_batch2,,,,,,,"['Section 18 of the RTI Act', 'Section 20(1) of the RTI Act']",COMPLAINT_S18,"Council of Scientific and Industrial Research Library Avenue, Pusa, New Delhi-110012",,"In the matter of 
- 
+2023-06-16-12482510_-_20.pdf,PRIMARY_DECISION,2023b,14785,CIC/CHRDG/C/2022/653614,,[],,,,,,cic_pdf_batch2,,,,,,,"['Section 18 of the RTI Act', 'Section 20(1) of the RTI Act']",COMPLAINT_S18,"Council of Scientific and Industrial Research Library Avenue, Pusa, New Delhi-110012",,"In the matter of
+
 Kamal Dhingra",
 case_2-108994-.pdf,PRIMARY_DECISION,2026,11309,CIC/MINES/A/2025/108994,,[],,Sudha Rani Relangi,,,,cic_pdf_batch2,11,14,14,,,11,"['Section 2(f) \nof RTI Act', 'section 2(f)', 'section 25(5) of the RTI Act']",UNKNOWN,"M/o. MINES, RTI CELL, ZONE-3,",11,,
 2023-02-20-160849619005.pdf,PRIMARY_DECISION,2023a,8209,CIC/FCIND/C/2021/619005,20.02.2023,[],,Amita Pandove,,,,cic_pdf_batch1,05.02.2021,,16.03.2021,24.03.2021,,06.09.2022,"['Section 18 of the RTI Act', 'Section 20(1)']",COMPLAINT_S18,"Food Corporation of India, Divisional Office Manmad, FCI Rd, Manmad, Nashik,",,,

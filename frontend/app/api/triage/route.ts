@@ -41,15 +41,25 @@ function redactWithGo(text: string): Promise<RedactionResponse> {
         response.on("data", (chunk: Buffer) => {
           size += chunk.length;
           if (size > 1_048_576) {
-            request.destroy(new Error("Go ingest response exceeded the size limit."));
+            request.destroy(
+              new Error("Go ingest response exceeded the size limit."),
+            );
             return;
           }
           chunks.push(chunk);
         });
         response.on("end", () => {
           const body = Buffer.concat(chunks).toString("utf8");
-          if (!response.statusCode || response.statusCode < 200 || response.statusCode >= 300) {
-            reject(new Error(`Go ingest returned HTTP ${response.statusCode ?? "unknown"}.`));
+          if (
+            !response.statusCode ||
+            response.statusCode < 200 ||
+            response.statusCode >= 300
+          ) {
+            reject(
+              new Error(
+                `Go ingest returned HTTP ${response.statusCode ?? "unknown"}.`,
+              ),
+            );
             return;
           }
           try {
@@ -64,7 +74,9 @@ function redactWithGo(text: string): Promise<RedactionResponse> {
               !Number.isSafeInteger(result.pii_entities_masked) ||
               result.pii_entities_masked < 0
             ) {
-              reject(new Error("Go ingest returned an invalid redaction response."));
+              reject(
+                new Error("Go ingest returned an invalid redaction response."),
+              );
               return;
             }
             resolve({
@@ -77,7 +89,9 @@ function redactWithGo(text: string): Promise<RedactionResponse> {
         });
       },
     );
-    request.setTimeout(5_000, () => request.destroy(new Error("Go ingest request timed out.")));
+    request.setTimeout(5_000, () =>
+      request.destroy(new Error("Go ingest request timed out.")),
+    );
     request.on("error", reject);
     request.end(JSON.stringify({ text }));
   });
@@ -115,9 +129,15 @@ export async function POST(request: Request): Promise<Response> {
     body = await readJSONLimited(request);
   } catch (error) {
     if (error instanceof RangeError) {
-      return Response.json({ detail: "Request body exceeds the size limit." }, { status: 413 });
+      return Response.json(
+        { detail: "Request body exceeds the size limit." },
+        { status: 413 },
+      );
     }
-    return Response.json({ detail: "Request body must be valid JSON." }, { status: 400 });
+    return Response.json(
+      { detail: "Request body must be valid JSON." },
+      { status: 400 },
+    );
   }
   if (
     typeof body !== "object" ||
@@ -127,11 +147,20 @@ export async function POST(request: Request): Promise<Response> {
     !body.text.trim() ||
     body.text.length > maxTextLength
   ) {
-    return Response.json({ detail: "Provide one non-empty text document of at most 100,000 characters." }, { status: 422 });
+    return Response.json(
+      {
+        detail:
+          "Provide one non-empty text document of at most 100,000 characters.",
+      },
+      { status: 422 },
+    );
   }
   const sourceType = "source_type" in body ? body.source_type : "text";
   if (sourceType !== "text" && sourceType !== "pdf" && sourceType !== "form") {
-    return Response.json({ detail: "The document source type is invalid." }, { status: 422 });
+    return Response.json(
+      { detail: "The document source type is invalid." },
+      { status: 422 },
+    );
   }
 
   try {
@@ -139,15 +168,24 @@ export async function POST(request: Request): Promise<Response> {
     const response = await fetch(`${API_BASE}/api/v1/process`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: redaction.redacted_text, source_type: sourceType }),
+      body: JSON.stringify({
+        text: redaction.redacted_text,
+        source_type: sourceType,
+      }),
       signal: AbortSignal.timeout(30_000),
     });
     const result: unknown = await response.json();
     if (!response.ok) {
-      return Response.json({ detail: `Classification service returned HTTP ${response.status}.` }, { status: 502 });
+      return Response.json(
+        { detail: `Classification service returned HTTP ${response.status}.` },
+        { status: 502 },
+      );
     }
     if (typeof result !== "object" || result === null) {
-      return Response.json({ detail: "Classification service returned an invalid response." }, { status: 502 });
+      return Response.json(
+        { detail: "Classification service returned an invalid response." },
+        { status: 502 },
+      );
     }
     return Response.json(
       {
@@ -157,7 +195,8 @@ export async function POST(request: Request): Promise<Response> {
       { status: response.status },
     );
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Document triage failed.";
+    const message =
+      error instanceof Error ? error.message : "Document triage failed.";
     return Response.json({ detail: message }, { status: 502 });
   }
 }

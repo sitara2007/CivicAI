@@ -57,6 +57,7 @@ markers = [
 
 [dependency-groups]
 dev = [
+    "pre-commit>=4.7.0",
     "ruff>=0.17.3",
 ]
 [tool.ruff]
@@ -64,4 +65,4 @@ line-length = 88
 target-version = "py312"
 
 [tool.ruff.lint]
-ignore = ["B008", "BLE001", "ASYNC230"]
+ignore = ["B008", "BLE001"]

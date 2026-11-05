@@ -1,6 +1,8 @@
 import json
 import random
 
+from collections import Counter
+
 rng = random.Random(42)
 
 templates = {
@@ -116,6 +118,6 @@ with open("eval/eval_set_50.jsonl", "w") as f:
     f.writelines(json.dumps(d, ensure_ascii=False) + "\n" for d in docs)
 
 print(f"Wrote {len(docs)} documents to eval/eval_set_50.jsonl")
-from collections import Counter
+
 
 print("Distribution:", Counter(d["label"] for d in docs))

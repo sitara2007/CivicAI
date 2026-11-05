@@ -7,7 +7,7 @@ GT = "eval/ground_truth_classification.jsonl"
 
 # FIX: Added with context manager
 with open(GT) as f:
-    rows = [json.loads(l) for l in f if l.strip()]
+    rows = [json.loads(line) for line in f if line.strip()]
 
 if not rows:
     print("Empty ground truth")

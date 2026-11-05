@@ -24,7 +24,6 @@ def _fake_encode(sentences, *args, **kwargs):
 
 @pytest.fixture
 def mock_sentence_transformer():
-
     with patch(
         "app.services.rag.generator.SentenceTransformer", create=True
     ) as mock_cls:

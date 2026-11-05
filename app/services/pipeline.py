@@ -51,7 +51,9 @@ class PipelineService:
             redacted_text, entities = sanitize(normalized)
             if persist_redacted is not None:
                 await persist_redacted(redacted_text, entities)
-            logger.info("pii_redacted", extra={"trace_id": str(trace_id), "entities": entities})
+            logger.info(
+                "pii_redacted", extra={"trace_id": str(trace_id), "entities": entities}
+            )
 
             policy_context = self._retrieve_policy_context(redacted_text, trace_id)
             decision, hop_count = self._llm.classify(

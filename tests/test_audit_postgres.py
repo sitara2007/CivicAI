@@ -1,4 +1,5 @@
 """Real-Postgres tests for the audit hash chain. Skipped if DB is disabled."""
+
 import asyncio
 import json
 
@@ -14,11 +15,13 @@ def _run(coro):
     async def wrapper():
         try:
             from app.db.models import Base
+
             async with engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
             return await coro
         finally:
             await engine.dispose()
+
     return asyncio.run(wrapper())
 
 
@@ -40,10 +43,12 @@ async def _append(i: int) -> None:
         return
     raise RuntimeError("No database session available")
 
+
 async def _verify():
     async for s in get_session():
         return await PostgresAuditStore(s).verify()
-    raise RuntimeError("No session available") 
+    raise RuntimeError("No session available")
+
 
 def test_tamper_detected():
     async def run():
@@ -53,19 +58,24 @@ def test_tamper_detected():
         assert (await _verify()).ok
 
         async for s in get_session():
-            row = (await s.execute(text(
-                "SELECT payload::text FROM audit_logs WHERE sequence=1"))).scalar_one()
+            row = (
+                await s.execute(
+                    text("SELECT payload::text FROM audit_logs WHERE sequence=1")
+                )
+            ).scalar_one()
             bad = json.loads(row)
             bad["tampered"] = True
-            await s.execute(text(
-                "UPDATE audit_logs SET payload=CAST(:p AS json) WHERE sequence=1"),
-                {"p": json.dumps(bad)})
+            await s.execute(
+                text("UPDATE audit_logs SET payload=CAST(:p AS json) WHERE sequence=1"),
+                {"p": json.dumps(bad)},
+            )
             await s.commit()
             break
 
         result = await _verify()
         assert not result.ok
         assert "line 1" in result.message
+
     _run(run())
 
 
@@ -76,4 +86,5 @@ def test_concurrent_append_keeps_chain_valid():
         result = await _verify()
         assert result.ok, result.message
         assert result.entries == 20
+
     _run(run())

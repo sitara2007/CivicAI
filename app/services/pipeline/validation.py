@@ -33,7 +33,7 @@ class DocumentValidator:
 
         return {
             "valid": True,
-                                    "mime_type": mime,
+            "mime_type": mime,
             "file_type": cls.ALLOWED_MIME_TYPES[mime],
             "size_mb": round(file_size_mb, 2),
         }

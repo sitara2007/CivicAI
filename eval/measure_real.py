@@ -8,7 +8,7 @@ API = "http://localhost:8000/api/v1/process"
 
 # FIX: Added with context manager
 with open("eval/eval_set_50.jsonl") as f:
-    rows = [json.loads(l) for l in f if l.strip()]
+    rows = [json.loads(line) for line in f if line.strip()]
 
 
 def call(text, retries=3):
