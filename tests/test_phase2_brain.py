@@ -93,11 +93,15 @@ def test_presidio_masks_pii_before_llm() -> None:
     """FR-1.2: names, SSNs, phone numbers masked before LLM."""
     captured: list[str] = []
 
-    def fake_sanitize(text: str) -> tuple[str, int]:
+    def fake_sanitize(text: str) -> tuple[str, list[dict]]:
         redacted = text.replace("123-45-6789", "<US_SSN>")
         redacted = redacted.replace("555-123-4567", "<PHONE_NUMBER>")
         redacted = redacted.replace("john.smith@email.com", "<EMAIL_ADDRESS>")
-        return redacted, 3
+        return redacted, [
+            {"type": "US_SSN", "start": 0, "end": 1, "score": 1.0},
+            {"type": "PHONE_NUMBER", "start": 0, "end": 1, "score": 1.0},
+            {"type": "EMAIL_ADDRESS", "start": 0, "end": 1, "score": 1.0},
+        ]
 
     def capture_classify(
         redacted_text: str, policy_context: str = ""
@@ -141,6 +145,6 @@ def test_presidio_masks_pii_before_llm() -> None:
 )
 def test_presidio_integration_masks_entities() -> None:
     """Optional live Presidio test when dependencies are installed."""
-    redacted, count = presidio_module.sanitize(PII_DOCUMENT)
-    assert count >= 1
+    redacted, entities = presidio_module.sanitize(PII_DOCUMENT)
+    assert len(entities) >= 1
     assert "123-45-6789" not in redacted or "<" in redacted
