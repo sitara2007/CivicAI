@@ -35,16 +35,23 @@ class SanitizationError(Exception):
     """Raised when Presidio is unavailable — fail closed, no LLM call."""
 
 
-def _regex_fallback(text: str) -> tuple[str, int]:
+def _regex_fallback(text: str) -> tuple[str, list[dict]]:
+    entities = []
+    for pattern, _ in _REGEX_PATTERNS:
+        for match in pattern.finditer(text):
+            entities.append({
+                "type": "REGEX",
+                "start": match.start(),
+                "end": match.end(),
+                "score": 1.0,
+            })
     redacted = text
-    count = 0
     for pattern, replacement in _REGEX_PATTERNS:
-        redacted, n = pattern.subn(replacement, redacted)
-        count += n
-    return redacted, count
+        redacted = pattern.sub(replacement, redacted)
+    return redacted, entities
 
 
-def _analyze_and_anonymize(text: str) -> tuple[str, int]:
+def _analyze_and_anonymize(text: str) -> tuple[str, list[dict]]:
     try:
         from presidio_analyzer import AnalyzerEngine
         from presidio_anonymizer import AnonymizerEngine
@@ -52,14 +59,29 @@ def _analyze_and_anonymize(text: str) -> tuple[str, int]:
         analyzer = AnalyzerEngine()
         results = analyzer.analyze(text=text, entities=ENTITIES, language="en")
         anonymized = AnonymizerEngine().anonymize(text=text, analyzer_results=results)
-        return anonymized.text, len(results)
+        entities = [
+            {
+                "type": r.entity_type,
+                "start": r.start,
+                "end": r.end,
+                "score": round(r.score, 3),
+            }
+            for r in results
+        ]
+        return anonymized.text, entities
     except Exception as exc:
         logger.warning("presidio_fallback_to_regex", extra={"error": str(exc)})
         return _regex_fallback(text)
 
 
-def sanitize(text: str) -> tuple[str, int]:
-    """Mask PII before any LLM transmission. Fail closed on circuit open."""
+def sanitize(text: str) -> tuple[str, list[dict]]:
+    """Mask PII before any LLM transmission. Fail closed on circuit open.
+
+    Returns (redacted_text, entities) where entities is a list of
+    {"type", "start", "end", "score"} dicts. Offsets are on the INPUT text,
+    not the redacted output — this is what makes the audit log an
+    independent record of what was detected and where.
+    """
     try:
         return presidio_breaker.call(_analyze_and_anonymize, text)
     except pybreaker.CircuitBreakerError as exc:
