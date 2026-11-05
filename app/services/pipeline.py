@@ -38,7 +38,7 @@ class PipelineService:
         document_id: uuid.UUID,
         text: str,
         source_type: SourceType,
-        persist_redacted: Callable[[str, int], Awaitable[None]] | None = None,
+        persist_redacted: Callable[[str, list[dict]], Awaitable[None]] | None = None,
     ) -> PipelineResult:
         """Execute ingest → Presidio → LLM → decision (sync path)."""
         _ = document_id, source_type
@@ -48,10 +48,10 @@ class PipelineService:
                 normalize_text(text),
                 max_tokens=self._settings.max_document_tokens,
             )
-            redacted_text, entity_count = sanitize(normalized)
+            redacted_text, entities = sanitize(normalized)
             if persist_redacted is not None:
-                await persist_redacted(redacted_text, entity_count)
-            logger.info("pii_redacted", extra={"trace_id": str(trace_id), "entities": entity_count})
+                await persist_redacted(redacted_text, entities)
+            logger.info("pii_redacted", extra={"trace_id": str(trace_id), "entities": entities})
 
             policy_context = self._retrieve_policy_context(redacted_text, trace_id)
             decision, hop_count = self._llm.classify(redacted_text, policy_context=policy_context)
@@ -62,7 +62,7 @@ class PipelineService:
                 decision=decision,
                 requires_review=requires_review,
                 hop_count=hop_count,
-                pii_entities_masked=entity_count,
+                pii_entities_masked=len(entities),
                 redacted_text=redacted_text,
             )
         except SanitizationError:
