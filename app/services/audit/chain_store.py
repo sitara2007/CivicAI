@@ -52,7 +52,9 @@ class JSONLAuditStore:
                 contents = stream.read()
                 existing, result = _parse_chain(contents)
                 if not result.ok:
-                    raise AuditChainError(f"cannot append to invalid audit chain: {result.message}")
+                    raise AuditChainError(
+                        f"cannot append to invalid audit chain: {result.message}"
+                    )
 
                 prev_hash = existing[-1]["hash"] if existing else GENESIS_HASH
                 sequence = len(existing)
@@ -64,9 +66,15 @@ class JSONLAuditStore:
                     "payload": serialized_payload,
                     "hash": entry_hash,
                 }
-                line = json.dumps(
-                    record, sort_keys=True, separators=(",", ":"), ensure_ascii=False
-                ).encode("utf-8") + b"\n"
+                line = (
+                    json.dumps(
+                        record,
+                        sort_keys=True,
+                        separators=(",", ":"),
+                        ensure_ascii=False,
+                    ).encode("utf-8")
+                    + b"\n"
+                )
                 stream.seek(0, os.SEEK_END)
                 stream.write(line)
                 stream.flush()
@@ -91,7 +99,9 @@ class JSONLAuditStore:
         except FileNotFoundError:
             return VerificationResult(ok=True, entries=0, message="empty chain")
         except OSError as exc:
-            return VerificationResult(ok=False, entries=0, message=f"cannot read chain: {exc}")
+            return VerificationResult(
+                ok=False, entries=0, message=f"cannot read chain: {exc}"
+            )
         _, result = _parse_chain(contents)
         return result
 
@@ -107,11 +117,15 @@ def _parse_chain(contents: bytes) -> tuple[list[dict[str, Any]], VerificationRes
             record = json.loads(line)
         except (json.JSONDecodeError, UnicodeDecodeError):
             return records, VerificationResult(
-                ok=False, entries=len(records), message=f"invalid JSON at line {line_number}"
+                ok=False,
+                entries=len(records),
+                message=f"invalid JSON at line {line_number}",
             )
         if not isinstance(record, dict):
             return records, VerificationResult(
-                ok=False, entries=len(records), message=f"invalid record at line {line_number}"
+                ok=False,
+                entries=len(records),
+                message=f"invalid record at line {line_number}",
             )
         if (
             set(record) != {"sequence", "prev_hash", "payload", "hash"}
@@ -123,7 +137,9 @@ def _parse_chain(contents: bytes) -> tuple[list[dict[str, Any]], VerificationRes
             or not isinstance(record.get("hash"), str)
         ):
             return records, VerificationResult(
-                ok=False, entries=len(records), message=f"broken link at line {line_number}"
+                ok=False,
+                entries=len(records),
+                message=f"broken link at line {line_number}",
             )
 
         expected_hash = compute_prev_hash(
@@ -131,11 +147,14 @@ def _parse_chain(contents: bytes) -> tuple[list[dict[str, Any]], VerificationRes
         )
         if not hmac.compare_digest(record["hash"], expected_hash):
             return records, VerificationResult(
-                ok=False, entries=len(records), message=f"hash mismatch at line {line_number}"
+                ok=False,
+                entries=len(records),
+                message=f"hash mismatch at line {line_number}",
             )
 
         expected_prev_hash = expected_hash
         records.append(record)
 
-    return records, VerificationResult(ok=True, entries=len(records), message="chain valid")
-
+    return records, VerificationResult(
+        ok=True, entries=len(records), message="chain valid"
+    )

@@ -19,6 +19,7 @@ from app.schemas.process import (
     ProcessRequest,
     ProcessResponse,
 )
+
 # NAYA IMPORT: PostgresAuditStore
 from app.services.audit.postgres_store import PostgresAuditStore
 from app.services.pipeline import PipelineService
@@ -91,7 +92,11 @@ async def process_document(
     created_at = datetime.now(UTC)
     audit_hash: str | None = None
 
-    if result.status == "completed" and result.decision is not None and result.redacted_text is not None:
+    if (
+        result.status == "completed"
+        and result.decision is not None
+        and result.redacted_text is not None
+    ):
         audit_payload = {
             "trace_id": str(trace_id),
             "document_id": str(document_id),
@@ -108,14 +113,21 @@ async def process_document(
                 entry = await db_audit_store.append(audit_payload)
             else:
                 # Fallback for tests (without DB)
-                from app.services.audit.chain_store import audit_store
                 import asyncio
+
+                from app.services.audit.chain_store import audit_store
+
                 entry = await asyncio.to_thread(audit_store.append, audit_payload)
 
             audit_hash = entry.hash
         except Exception as exc:
-            logger.error("audit_chain_append_failed", extra={"trace_id": str(trace_id), "error": str(exc)})
-            raise HTTPException(status_code=500, detail="Audit record could not be written") from exc
+            logger.error(
+                "audit_chain_append_failed",
+                extra={"trace_id": str(trace_id), "error": str(exc)},
+            )
+            raise HTTPException(
+                status_code=500, detail="Audit record could not be written"
+            ) from exc
 
     return ProcessResponse(
         trace_id=trace_id,

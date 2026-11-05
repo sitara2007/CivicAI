@@ -17,9 +17,7 @@ class PostgresAuditStore:
         self._session = session
 
     async def append(self, payload: dict[str, Any]) -> AuditEntry:
-        await self._session.execute(
-            text("SELECT pg_advisory_xact_lock(8675309)")
-        )
+        await self._session.execute(text("SELECT pg_advisory_xact_lock(8675309)"))
         stmt = select(SQLAuditLog).order_by(SQLAuditLog.sequence.desc()).limit(1)
         result = await self._session.execute(stmt)
         last_entry = result.scalar_one_or_none()
@@ -31,10 +29,7 @@ class PostgresAuditStore:
         entry_hash = compute_prev_hash(chain_data)
 
         new_log = SQLAuditLog(
-            sequence=sequence,
-            prev_hash=prev_hash,
-            payload=payload,
-            hash=entry_hash
+            sequence=sequence, prev_hash=prev_hash, payload=payload, hash=entry_hash
         )
         self._session.add(new_log)
         await self._session.commit()
@@ -58,13 +53,21 @@ class PostgresAuditStore:
         expected_prev_hash = GENESIS_HASH
         for i, log in enumerate(logs):
             if log.sequence != i:
-                return VerificationResult(ok=False, entries=i, message=f"broken sequence at line {i}")
+                return VerificationResult(
+                    ok=False, entries=i, message=f"broken sequence at line {i}"
+                )
             if log.prev_hash != expected_prev_hash:
-                return VerificationResult(ok=False, entries=i, message=f"broken link at line {i}")
+                return VerificationResult(
+                    ok=False, entries=i, message=f"broken link at line {i}"
+                )
 
-            expected_hash = compute_prev_hash({"prev_hash": expected_prev_hash, "payload": log.payload})
+            expected_hash = compute_prev_hash(
+                {"prev_hash": expected_prev_hash, "payload": log.payload}
+            )
             if not hmac.compare_digest(log.hash, expected_hash):
-                return VerificationResult(ok=False, entries=i, message=f"hash mismatch at line {i}")
+                return VerificationResult(
+                    ok=False, entries=i, message=f"hash mismatch at line {i}"
+                )
 
             expected_prev_hash = expected_hash
 

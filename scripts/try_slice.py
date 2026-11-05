@@ -23,7 +23,14 @@ DOCUMENT = (
 
 
 def run(command: list[str], *, cwd: Path, env: dict[str, str] | None = None) -> None:
-    subprocess.run(command, cwd=cwd, env=env, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(
+        command,
+        cwd=cwd,
+        env=env,
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
 
 
 def generate_mtls_certificates(directory: Path) -> tuple[Path, Path, Path, Path, Path]:
@@ -38,19 +45,40 @@ def generate_mtls_certificates(directory: Path) -> tuple[Path, Path, Path, Path,
 
     run(
         [
-            "openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes",
-            "-keyout", str(ca_key), "-out", str(ca_cert), "-days", "1",
-            "-subj", "/CN=CivicAI local slice CA",
-            "-addext", "basicConstraints=critical,CA:TRUE",
-            "-addext", "keyUsage=critical,keyCertSign,cRLSign",
+            "openssl",
+            "req",
+            "-x509",
+            "-newkey",
+            "rsa:2048",
+            "-nodes",
+            "-keyout",
+            str(ca_key),
+            "-out",
+            str(ca_cert),
+            "-days",
+            "1",
+            "-subj",
+            "/CN=CivicAI local slice CA",
+            "-addext",
+            "basicConstraints=critical,CA:TRUE",
+            "-addext",
+            "keyUsage=critical,keyCertSign,cRLSign",
         ],
         cwd=directory,
     )
     run(
         [
-            "openssl", "req", "-newkey", "rsa:2048", "-nodes",
-            "-keyout", str(server_key), "-out", str(server_csr),
-            "-subj", "/CN=localhost",
+            "openssl",
+            "req",
+            "-newkey",
+            "rsa:2048",
+            "-nodes",
+            "-keyout",
+            str(server_key),
+            "-out",
+            str(server_csr),
+            "-subj",
+            "/CN=localhost",
         ],
         cwd=directory,
     )
@@ -61,17 +89,38 @@ def generate_mtls_certificates(directory: Path) -> tuple[Path, Path, Path, Path,
     )
     run(
         [
-            "openssl", "x509", "-req", "-in", str(server_csr),
-            "-CA", str(ca_cert), "-CAkey", str(ca_key), "-CAcreateserial",
-            "-out", str(server_cert), "-days", "1", "-extfile", str(server_extensions),
+            "openssl",
+            "x509",
+            "-req",
+            "-in",
+            str(server_csr),
+            "-CA",
+            str(ca_cert),
+            "-CAkey",
+            str(ca_key),
+            "-CAcreateserial",
+            "-out",
+            str(server_cert),
+            "-days",
+            "1",
+            "-extfile",
+            str(server_extensions),
         ],
         cwd=directory,
     )
     run(
         [
-            "openssl", "req", "-newkey", "rsa:2048", "-nodes",
-            "-keyout", str(client_key), "-out", str(client_csr),
-            "-subj", "/CN=local-slice-tenant",
+            "openssl",
+            "req",
+            "-newkey",
+            "rsa:2048",
+            "-nodes",
+            "-keyout",
+            str(client_key),
+            "-out",
+            str(client_csr),
+            "-subj",
+            "/CN=local-slice-tenant",
         ],
         cwd=directory,
     )
@@ -79,9 +128,22 @@ def generate_mtls_certificates(directory: Path) -> tuple[Path, Path, Path, Path,
     client_extensions.write_text("extendedKeyUsage=clientAuth\n", encoding="ascii")
     run(
         [
-            "openssl", "x509", "-req", "-in", str(client_csr),
-            "-CA", str(ca_cert), "-CAkey", str(ca_key), "-CAcreateserial",
-            "-out", str(client_cert), "-days", "1", "-extfile", str(client_extensions),
+            "openssl",
+            "x509",
+            "-req",
+            "-in",
+            str(client_csr),
+            "-CA",
+            str(ca_cert),
+            "-CAkey",
+            str(ca_key),
+            "-CAcreateserial",
+            "-out",
+            str(client_cert),
+            "-days",
+            "1",
+            "-extfile",
+            str(client_extensions),
         ],
         cwd=directory,
     )
@@ -119,7 +181,9 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory(prefix="civicai-slice-") as temporary_directory:
         directory = Path(temporary_directory)
-        ca_cert, server_cert, server_key, client_cert, client_key = generate_mtls_certificates(directory)
+        ca_cert, server_cert, server_key, client_cert, client_key = (
+            generate_mtls_certificates(directory)
+        )
         port = available_port()
         address = f"127.0.0.1:{port}"
         environment = os.environ.copy()
@@ -134,7 +198,11 @@ def main() -> int:
         tls_context = ssl.create_default_context(cafile=str(ca_cert))
         tls_context.load_cert_chain(str(client_cert), str(client_key))
         binary = directory / "civicai-ingest"
-        run(["go", "build", "-o", str(binary), "./cmd/ingest"], cwd=ROOT, env=environment)
+        run(
+            ["go", "build", "-o", str(binary), "./cmd/ingest"],
+            cwd=ROOT,
+            env=environment,
+        )
         processes: list[subprocess.Popen[bytes]] = []
         server = subprocess.Popen(
             [str(binary)],
@@ -191,7 +259,9 @@ def main() -> int:
                 stderr=subprocess.DEVNULL,
             )
             processes.append(python_server)
-            wait_for_service(f"http://127.0.0.1:{api_port}/health", python_server, "Python API")
+            wait_for_service(
+                f"http://127.0.0.1:{api_port}/health", python_server, "Python API"
+            )
 
             if args.with_nextjs:
                 frontend_port = available_port()
@@ -199,7 +269,9 @@ def main() -> int:
                 frontend_environment.update(
                     {
                         "GO_INGEST_URL": f"{endpoint}/v1/redact",
-                        "GO_INGEST_CLIENT_CERT": client_cert.read_text(encoding="ascii"),
+                        "GO_INGEST_CLIENT_CERT": client_cert.read_text(
+                            encoding="ascii"
+                        ),
                         "GO_INGEST_CLIENT_KEY": client_key.read_text(encoding="ascii"),
                         "GO_INGEST_SERVER_CA": ca_cert.read_text(encoding="ascii"),
                         "NEXT_PUBLIC_API_BASE": f"http://127.0.0.1:{api_port}",
@@ -269,7 +341,10 @@ def main() -> int:
             ):
                 raise RuntimeError("The frontend workflow returned unredacted text")
             decision = result["decision"]
-            if not isinstance(decision, dict) or decision.get("department") != "Public Works":
+            if (
+                not isinstance(decision, dict)
+                or decision.get("department") != "Public Works"
+            ):
                 raise RuntimeError("Python classification returned an unexpected route")
             audit_hash = result.get("audit_hash")
             if not isinstance(audit_hash, str) or len(audit_hash) != 64:
@@ -277,14 +352,20 @@ def main() -> int:
 
             audit_path = directory / "data" / "audit-chain.jsonl"
             verification = subprocess.run(
-                [sys.executable, str(ROOT / "scripts" / "verify_audit.py"), str(audit_path)],
+                [
+                    sys.executable,
+                    str(ROOT / "scripts" / "verify_audit.py"),
+                    str(audit_path),
+                ],
                 cwd=ROOT,
                 check=False,
                 text=True,
                 capture_output=True,
             )
             if verification.returncode != 0:
-                raise RuntimeError(verification.stdout.strip() or "Audit-chain verification failed")
+                raise RuntimeError(
+                    verification.stdout.strip() or "Audit-chain verification failed"
+                )
             print(f"Route: {decision['department']}")
             print(f"Audit hash: {audit_hash}")
             print(verification.stdout.strip())

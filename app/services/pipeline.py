@@ -51,11 +51,21 @@ class PipelineService:
             redacted_text, entities = sanitize(normalized)
             if persist_redacted is not None:
                 await persist_redacted(redacted_text, entities)
-            logger.info("pii_redacted", extra={"trace_id": str(trace_id), "entities": entities})
+
+            logger.info(
+                "pii_redacted", extra={"trace_id": str(trace_id), "entities": entities}
+            )
+            logger.info(
+                "pii_redacted", extra={"trace_id": str(trace_id), "entities": entities}
+            )
 
             policy_context = self._retrieve_policy_context(redacted_text, trace_id)
-            decision, hop_count = self._llm.classify(redacted_text, policy_context=policy_context)
-            requires_review = decision.confidence < self._settings.review_confidence_threshold
+            decision, hop_count = self._llm.classify(
+                redacted_text, policy_context=policy_context
+            )
+            requires_review = (
+                decision.confidence < self._settings.review_confidence_threshold
+            )
 
             return PipelineResult(
                 status="completed",
@@ -66,7 +76,9 @@ class PipelineService:
                 redacted_text=redacted_text,
             )
         except SanitizationError:
-            logger.error("pipeline_sanitization_failed", extra={"trace_id": str(trace_id)})
+            logger.error(
+                "pipeline_sanitization_failed", extra={"trace_id": str(trace_id)}
+            )
             return PipelineResult(status="dlq", decision=None, requires_review=False)
         except AgenticHopExhausted as exc:
             logger.error(

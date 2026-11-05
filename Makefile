@@ -8,7 +8,7 @@ test:
 
 fix:
 	uv run ruff check . --fix
-	
+
 push: test
 	git add .
 	git commit -m "chore: automated commit" || true

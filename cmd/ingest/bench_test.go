@@ -1,9 +1,9 @@
 package main
 
 import (
-    "bytes"
-    "testing"
-    "time"
+	"bytes"
+	"testing"
+	"time"
 )
 
 var benchPayload = []byte(`{
@@ -18,45 +18,45 @@ var benchPayload = []byte(`{
 }`)
 
 func BenchmarkDecodeEvent(b *testing.B) {
-    b.ReportAllocs()
-    for i := 0; i < b.N; i++ {
-        evt, err := decodeEvent(benchPayload, "fallback")
-        if err != nil {
-            b.Fatal(err)
-        }
-        if evt == nil {
-            b.Fatal("nil event")
-        }
-        releaseEvent(evt)
-    }
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		evt, err := decodeEvent(benchPayload, "fallback")
+		if err != nil {
+			b.Fatal(err)
+		}
+		if evt == nil {
+			b.Fatal("nil event")
+		}
+		releaseEvent(evt)
+	}
 }
 
 func BenchmarkEventQueuePublish(b *testing.B) {
-    b.ReportAllocs()
-    q := newEventQueue(65536)
-    evt := &AuditEvent{}
-    b.ResetTimer()
-    for i := 0; i < b.N; i++ {
-        if !q.publish(evt) {
-            <-q.ch
-            q.publish(evt)
-        }
-    }
+	b.ReportAllocs()
+	q := newEventQueue(65536)
+	evt := &AuditEvent{}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		if !q.publish(evt) {
+			<-q.ch
+			q.publish(evt)
+		}
+	}
 }
 
 func BenchmarkAppendEventJSON(b *testing.B) {
-    b.ReportAllocs()
-    evt := &AuditEvent{}
-    evt.Sequence = 42
-    evt.TS = time.Now().UnixNano()
-    copy(evt.TenantID[:], "550e8400-e29b-41d4-a716")
-    copy(evt.EventType[:], "document.ingested")
-    evt.EventTypeN = len("document.ingested")
-    var buf bytes.Buffer
-    buf.Grow(512)
-    b.ResetTimer()
-    for i := 0; i < b.N; i++ {
-        buf.Reset()
-        appendEventJSON(&buf, evt)
-    }
+	b.ReportAllocs()
+	evt := &AuditEvent{}
+	evt.Sequence = 42
+	evt.TS = time.Now().UnixNano()
+	copy(evt.TenantID[:], "550e8400-e29b-41d4-a716")
+	copy(evt.EventType[:], "document.ingested")
+	evt.EventTypeN = len("document.ingested")
+	var buf bytes.Buffer
+	buf.Grow(512)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		appendEventJSON(&buf, evt)
+	}
 }

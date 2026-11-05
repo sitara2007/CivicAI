@@ -28,6 +28,7 @@ def _presidio_available() -> bool:
     except ImportError:
         return False
 
+
 # PRD Phase 2: three canonical test documents
 PHASE2_DOCUMENTS: list[dict[str, str]] = [
     {
@@ -63,10 +64,14 @@ PII_DOCUMENT = (
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("case", PHASE2_DOCUMENTS, ids=lambda c: c["gold_category"].value)
+@pytest.mark.parametrize(
+    "case", PHASE2_DOCUMENTS, ids=lambda c: c["gold_category"].value
+)
 async def test_three_documents_classify_correctly(case: dict[str, str]) -> None:
     """PRD Phase 2 deliverable: 3/3 test docs classify correctly."""
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
         response = await client.post(
             "/api/v1/process",
             json={"text": case["text"], "source_type": "text"},
@@ -98,7 +103,9 @@ def test_presidio_masks_pii_before_llm() -> None:
             {"type": "EMAIL_ADDRESS", "start": 0, "end": 1, "score": 1.0},
         ]
 
-    def capture_classify(redacted_text: str, policy_context: str = "") -> tuple[object, int]:
+    def capture_classify(
+        redacted_text: str, policy_context: str = ""
+    ) -> tuple[object, int]:
         _ = policy_context
         captured.append(redacted_text)
         from app.services.mock_classifier import classify_mock
@@ -107,7 +114,9 @@ def test_presidio_masks_pii_before_llm() -> None:
 
     with (
         patch("app.services.pipeline.sanitize", side_effect=fake_sanitize),
-        patch("app.services.pipeline.LLMService.classify", side_effect=capture_classify),
+        patch(
+            "app.services.pipeline.LLMService.classify", side_effect=capture_classify
+        ),
     ):
         import asyncio
 

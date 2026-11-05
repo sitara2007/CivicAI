@@ -1,0 +1,728 @@
+{
+  "label": "smoke test, MOCK_LLM=true, not accuracy",
+  "endpoint": "http://127.0.0.1:8000/api/v1/process",
+  "summary": {
+    "sample_size": 50,
+    "successful": 50,
+    "success_rate_percent": 100.0,
+    "p50_latency_ms": 8.163076999608165,
+    "p95_latency_ms": 13.967645500042634,
+    "category_distribution": {
+      "Complaint": 3,
+      "Other": 39,
+      "Report": 3,
+      "Request": 5
+    },
+    "department_distribution": {
+      "General Intake": 39,
+      "Public Works": 3,
+      "Tax Assessor": 5,
+      "Water Utilities": 3
+    },
+    "total_pii_entities_masked": 0,
+    "distinct_decisions": 4,
+    "same_decision_for_every_successful_input": false
+  },
+  "results": [
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 37.63609099951282,
+      "hf_id": "520"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 13.249313999949663,
+      "hf_id": "771"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 11.05267700040713,
+      "hf_id": "431"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 8.48811099967861,
+      "hf_id": "627"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Request",
+        "priority": "Low",
+        "department": "Tax Assessor",
+        "confidence": 0.89
+      },
+      "requires_review": false,
+      "pii_entities_masked": 0,
+      "latency_ms": 6.957431000046199,
+      "hf_id": "1086"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 5.34731700008706,
+      "hf_id": "248"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 5.636881999635079,
+      "hf_id": "145"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Report",
+        "priority": "Low",
+        "department": "Water Utilities",
+        "confidence": 0.93
+      },
+      "requires_review": false,
+      "pii_entities_masked": 0,
+      "latency_ms": 7.383449000371911,
+      "hf_id": "737"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 6.999774000178149,
+      "hf_id": "327"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Report",
+        "priority": "Low",
+        "department": "Water Utilities",
+        "confidence": 0.93
+      },
+      "requires_review": false,
+      "pii_entities_masked": 0,
+      "latency_ms": 8.37733800017304,
+      "hf_id": "33"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 11.313813000015216,
+      "hf_id": "615"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 9.594301999641175,
+      "hf_id": "201"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Request",
+        "priority": "Low",
+        "department": "Tax Assessor",
+        "confidence": 0.89
+      },
+      "requires_review": false,
+      "pii_entities_masked": 0,
+      "latency_ms": 7.281371000317449,
+      "hf_id": "398"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 6.190637999679893,
+      "hf_id": "198"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 6.537088000186486,
+      "hf_id": "548"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 5.783961000815907,
+      "hf_id": "219"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Request",
+        "priority": "Low",
+        "department": "Tax Assessor",
+        "confidence": 0.89
+      },
+      "requires_review": false,
+      "pii_entities_masked": 0,
+      "latency_ms": 8.881241000381124,
+      "hf_id": "635"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 6.11016400034714,
+      "hf_id": "574"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 8.673506999912206,
+      "hf_id": "307"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 8.307989000059024,
+      "hf_id": "195"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 7.882893999521912,
+      "hf_id": "902"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 9.109999999964202,
+      "hf_id": "562"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Request",
+        "priority": "Low",
+        "department": "Tax Assessor",
+        "confidence": 0.89
+      },
+      "requires_review": false,
+      "pii_entities_masked": 0,
+      "latency_ms": 9.771074000127555,
+      "hf_id": "55"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Complaint",
+        "priority": "High",
+        "department": "Public Works",
+        "confidence": 0.91
+      },
+      "requires_review": false,
+      "pii_entities_masked": 0,
+      "latency_ms": 14.354433999869798,
+      "hf_id": "397"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Complaint",
+        "priority": "High",
+        "department": "Public Works",
+        "confidence": 0.91
+      },
+      "requires_review": false,
+      "pii_entities_masked": 0,
+      "latency_ms": 32.94204800022271,
+      "hf_id": "240"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 10.919548999481776,
+      "hf_id": "823"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 6.888068000080239,
+      "hf_id": "65"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 8.399980999456602,
+      "hf_id": "684"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 8.533549000276253,
+      "hf_id": "530"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 7.171317999564053,
+      "hf_id": "843"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Request",
+        "priority": "Low",
+        "department": "Tax Assessor",
+        "confidence": 0.89
+      },
+      "requires_review": false,
+      "pii_entities_masked": 0,
+      "latency_ms": 12.236272000336612,
+      "hf_id": "767"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 9.459543000048143,
+      "hf_id": "820"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Report",
+        "priority": "Low",
+        "department": "Water Utilities",
+        "confidence": 0.93
+      },
+      "requires_review": false,
+      "pii_entities_masked": 0,
+      "latency_ms": 12.293667999983882,
+      "hf_id": "611"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 6.912174000717641,
+      "hf_id": "212"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 8.142628999848966,
+      "hf_id": "860"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 5.247774999588728,
+      "hf_id": "1051"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 7.280691000232764,
+      "hf_id": "637"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 6.521979999888572,
+      "hf_id": "1010"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 7.065447000059066,
+      "hf_id": "724"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 6.46808500005136,
+      "hf_id": "510"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 6.240132000129961,
+      "hf_id": "466"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 7.0258430005196715,
+      "hf_id": "906"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 6.997581000177888,
+      "hf_id": "107"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 13.494904000253882,
+      "hf_id": "310"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 9.066160000656964,
+      "hf_id": "210"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 9.046854999724019,
+      "hf_id": "483"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 8.183524999367364,
+      "hf_id": "235"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Complaint",
+        "priority": "High",
+        "department": "Public Works",
+        "confidence": 0.91
+      },
+      "requires_review": false,
+      "pii_entities_masked": 0,
+      "latency_ms": 6.901767999806907,
+      "hf_id": "739"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 7.414755000354489,
+      "hf_id": "669"
+    },
+    {
+      "http_code": 200,
+      "status": "completed",
+      "decision": {
+        "category": "Other",
+        "priority": "Medium",
+        "department": "General Intake",
+        "confidence": 0.7
+      },
+      "requires_review": true,
+      "pii_entities_masked": 0,
+      "latency_ms": 11.433061000388989,
+      "hf_id": "671"
+    }
+  ]
+}

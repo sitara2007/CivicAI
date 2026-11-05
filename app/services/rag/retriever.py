@@ -39,16 +39,13 @@ def retrieve(query, top_k=3):
 
     try:
         results = client.query_points(
-            collection_name=collection_name,
-            query=query_vector,
-            limit=top_k
+            collection_name=collection_name, query=query_vector, limit=top_k
         )
         return [
-            {
-                "text": point.payload["text"],
-                "score": point.score
-            }
+            {"text": point.payload["text"], "score": point.score}
             for point in results.points
         ]
     except (TimeoutError, Exception):
-        return _pgvector_bm25_fallback(query, top_k)  # Positional argument matches the test expectation
+        return _pgvector_bm25_fallback(
+            query, top_k
+        )  # Positional argument matches the test expectation

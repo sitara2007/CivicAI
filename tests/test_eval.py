@@ -82,7 +82,9 @@ def load_golden_dataset(path: Path) -> list[GoldenSample]:
     return samples
 
 
-def evaluate_sample(client: httpx.Client, sample: GoldenSample, api_url: str) -> EvalResult:
+def evaluate_sample(
+    client: httpx.Client, sample: GoldenSample, api_url: str
+) -> EvalResult:
     started = time.perf_counter()
     try:
         response = client.post(
@@ -156,7 +158,9 @@ def run_evaluation(
 ) -> EvalReport:
     samples = load_golden_dataset(dataset_path)
     if len(samples) < min_samples:
-        raise ValueError(f"Dataset has {len(samples)} samples; need at least {min_samples}")
+        raise ValueError(
+            f"Dataset has {len(samples)} samples; need at least {min_samples}"
+        )
 
     results: list[EvalResult] = []
     with httpx.Client() as client:
@@ -217,7 +221,9 @@ def test_eval_report_thresholds() -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run GovFlow Golden Test Set evaluation")
+    parser = argparse.ArgumentParser(
+        description="Run GovFlow Golden Test Set evaluation"
+    )
     parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
     parser.add_argument("--api-url", default="http://localhost:8000")
     parser.add_argument("--output", type=Path, default=ROOT / "eval" / "results")

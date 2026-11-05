@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db_session
-from app.schemas.process import DocumentCategory, HistoryItem, HistoryResponse, Priority
 from app.db.repositories.document_repo import DocumentRepository
+from app.schemas.process import DocumentCategory, HistoryItem, HistoryResponse, Priority
 
 router = APIRouter(prefix="/api/v1", tags=["history"])
 
@@ -35,9 +35,13 @@ async def get_history(
             HistoryItem(
                 trace_id=doc.trace_id,
                 document_id=doc.id,
-                status=doc.status.value if hasattr(doc.status, "value") else str(doc.status),
+                status=doc.status.value
+                if hasattr(doc.status, "value")
+                else str(doc.status),
                 source_type=doc.source_type,
-                category=DocumentCategory(decision.category.value) if decision else None,
+                category=DocumentCategory(decision.category.value)
+                if decision
+                else None,
                 priority=Priority(decision.priority.value) if decision else None,
                 department=decision.department if decision else None,
                 confidence=decision.confidence if decision else None,

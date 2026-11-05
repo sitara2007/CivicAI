@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-import json
-
+import instructor
 from openai import OpenAI
 
 from app.core.config import get_settings
@@ -25,22 +24,32 @@ class LLMService:
 
     def __init__(self) -> None:
         self._settings = get_settings()
-        self._client: OpenAI | None = None
+        self._client = None
 
-    def classify(self, redacted_text: str, policy_context: str = "") -> tuple[DecisionOutput, int]:
+    def classify(
+        self, redacted_text: str, policy_context: str = ""
+    ) -> tuple[DecisionOutput, int]:
         if self._settings.use_mock_llm:
             return classify_mock(redacted_text), 1
 
         if self._client is None:
-            self._client = OpenAI(api_key=self._settings.openai_api_key)
+            # TOP-1 FIX: Patch the OpenAI client with Instructor for Groq
+            self._client = instructor.from_openai(
+                OpenAI(
+                    api_key=self._settings.openai_api_key,
+                    base_url="https://api.groq.com/openai/v1",
+                )
+            )
 
-        response = self._client.chat.completions.create(
+        # TOP-1 FIX: Force the LLM to return the exact Pydantic model.
+        decision = self._client.chat.completions.create(
             model=self._settings.openai_model,
             messages=build_classification_messages(
                 redacted_text=redacted_text,
                 policy_context=policy_context,
             ),
-            response_format={"type": "json_object"},
+            response_model=DecisionOutput,
+            max_retries=3,
         )
-        content = response.choices[0].message.content or "{}"
-        return DecisionOutput.model_validate(json.loads(content)), 1
+
+        return decision, 1

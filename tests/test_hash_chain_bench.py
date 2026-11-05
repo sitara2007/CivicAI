@@ -10,10 +10,12 @@ from app.services.audit.hash_chain import compute_prev_hash
 def test_genesis_hash(benchmark):
     benchmark(hashlib.sha256, b"GENESIS")
 
+
 @pytest.mark.benchmark(group="hash_chain")
 def test_compute_prev_hash_small(benchmark):
     entry = {"id": "abc", "action": "INGESTED", "ts": datetime.now(UTC)}
     benchmark(compute_prev_hash, entry)
+
 
 @pytest.mark.benchmark(group="hash_chain")
 def test_compute_prev_hash_large(benchmark):

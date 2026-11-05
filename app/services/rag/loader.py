@@ -2,7 +2,6 @@ from pypdf import PdfReader
 
 
 def load_pdf(path):
-
     reader = PdfReader(path)
 
     text = ""
@@ -14,9 +13,6 @@ def load_pdf(path):
 
 
 if __name__ == "__main__":
-
-    result = load_pdf(
-        "data/documents/scheme.pdf"
-    )
+    result = load_pdf("data/documents/scheme.pdf")
 
     print(result[:1000])

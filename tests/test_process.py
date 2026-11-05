@@ -25,7 +25,9 @@ def mock_decision() -> DecisionOutput:
 
 @pytest.mark.asyncio
 async def test_health_endpoint() -> None:
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
         response = await client.get("/health")
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
@@ -33,7 +35,9 @@ async def test_health_endpoint() -> None:
 
 @pytest.mark.asyncio
 async def test_process_rejects_empty_text() -> None:
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
         response = await client.post("/api/v1/process", json={"text": "   "})
     assert response.status_code == 422
 
@@ -50,8 +54,12 @@ async def test_process_returns_valid_json(mock_decision: DecisionOutput) -> None
         pii_entities_masked=2,
     )
 
-    with patch.object(PipelineService, "run_sync", new_callable=AsyncMock, return_value=mock_result):
-        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+    with patch.object(
+        PipelineService, "run_sync", new_callable=AsyncMock, return_value=mock_result
+    ):
+        async with AsyncClient(
+            transport=ASGITransport(app=app), base_url="http://test"
+        ) as client:
             response = await client.post(
                 "/api/v1/process",
                 json={
