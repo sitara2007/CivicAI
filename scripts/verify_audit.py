@@ -10,7 +10,9 @@ from app.services.audit.chain_store import JSONLAuditStore
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("path", nargs="?", type=Path, default=Path("data/audit-chain.jsonl"))
+    parser.add_argument(
+        "path", nargs="?", type=Path, default=Path("data/audit-chain.jsonl")
+    )
     args = parser.parse_args()
 
     result = JSONLAuditStore(args.path).verify()

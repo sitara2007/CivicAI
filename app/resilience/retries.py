@@ -29,7 +29,9 @@ def _log_retry(retry_state: RetryCallState) -> None:
 
 
 openai_retry = retry(
-    retry=retry_if_exception_type((RateLimitError, APITimeoutError, APIConnectionError)),
+    retry=retry_if_exception_type(
+        (RateLimitError, APITimeoutError, APIConnectionError)
+    ),
     stop=stop_after_attempt(3),
     wait=wait_exponential_jitter(initial=1, max=10),
     before_sleep=_log_retry,

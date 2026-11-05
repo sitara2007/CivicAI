@@ -9,6 +9,7 @@ from app.core.config import get_settings
 from app.db.session import engine, get_session
 from app.services.audit.postgres_store import PostgresAuditStore
 
+
 def _run(coro):
     async def wrapper():
         try:
@@ -36,7 +37,7 @@ async def _truncate():
 async def _append(i: int) -> None:
     async for s in get_session():
         await PostgresAuditStore(s).append({"n": i})
-        return  # Exit after the first iteration
+        return
     raise RuntimeError("No database session available")
 
 async def _verify():

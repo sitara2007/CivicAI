@@ -154,7 +154,7 @@ def render_mermaid(diagram: str, caption: str = "Architecture Diagram") -> str:
         )
     except Exception as exc:
         return (
-            f'<pre><strong>[Diagram: {caption}]</strong>\n'
+            f"<pre><strong>[Diagram: {caption}]</strong>\n"
             f"(Mermaid source — render unavailable: {exc})\n\n"
             f"{diagram.strip()}</pre>"
         )

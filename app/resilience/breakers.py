@@ -26,7 +26,11 @@ class _StateChangeListener(pybreaker.CircuitBreakerListener):
     ) -> None:
         logger.warning(
             "circuit_breaker_state_change",
-            extra={"breaker": breaker.name, "old_state": old.name, "new_state": new.name},
+            extra={
+                "breaker": breaker.name,
+                "old_state": old.name,
+                "new_state": new.name,
+            },
         )
 
 
@@ -47,7 +51,7 @@ presidio_breaker = pybreaker.CircuitBreaker(
 )
 
 
-def with_openai_breaker(func: Callable[P, R]) -> Callable[P, R]:
+def with_openai_breaker[**P, R](func: Callable[P, R]) -> Callable[P, R]:
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         return openai_breaker.call(func, *args, **kwargs)
 

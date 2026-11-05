@@ -43,7 +43,9 @@ def process_document_task(
             "hop_count": str(hop_count),
         }
     except AgenticHopExhausted:
-        logger.error("task_dlq", extra={"trace_id": trace_id, "document_id": document_id})
+        logger.error(
+            "task_dlq", extra={"trace_id": trace_id, "document_id": document_id}
+        )
         return {"status": "dlq"}
     except Exception as exc:
         logger.warning("task_transient_error", extra={"error": str(exc)})

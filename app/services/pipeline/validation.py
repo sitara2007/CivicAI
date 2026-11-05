@@ -1,13 +1,13 @@
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import magic
 
 
 class DocumentValidator:
     """Validates incoming document structure and size limits."""
-    
-    ALLOWED_MIME_TYPES = {
+
+    ALLOWED_MIME_TYPES: ClassVar[dict[str, str]] = {
         "application/pdf": "PDF",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "DOCX",
         "text/plain": "TXT",
@@ -22,7 +22,10 @@ class DocumentValidator:
 
         file_size_mb = path.stat().st_size / (1024 * 1024)
         if file_size_mb > cls.MAX_FILE_SIZE_MB:
-            return {"valid": False, "error": f"File exceeds {cls.MAX_FILE_SIZE_MB}MB limit"}
+            return {
+                "valid": False,
+                "error": f"File exceeds {cls.MAX_FILE_SIZE_MB}MB limit",
+            }
 
         mime = magic.from_file(file_path, mime=True)
         if mime not in cls.ALLOWED_MIME_TYPES:
@@ -30,7 +33,7 @@ class DocumentValidator:
 
         return {
             "valid": True,
-            "mime_type": mime,
+                                    "mime_type": mime,
             "file_type": cls.ALLOWED_MIME_TYPES[mime],
             "size_mb": round(file_size_mb, 2),
         }

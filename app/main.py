@@ -12,12 +12,13 @@ from fastapi.responses import JSONResponse
 from app.api.router import api_router
 from app.core.config import get_settings
 from app.core.logging import configure_logging
+from app.db.models import Base
 
 # YAHAN NAYE IMPORTS HAIN:
 from app.db.session import engine
-from app.db.models import Base
 
 logger = logging.getLogger("app.main")
+
 
 def validate_required_environment() -> None:
     """Fail fast when required startup environment variables are missing."""
@@ -34,6 +35,7 @@ def validate_required_environment() -> None:
         missing_vars = ", ".join(missing)
         raise RuntimeError(f"Missing required environment variable(s): {missing_vars}")
 
+
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Manage application startup and shutdown concerns."""
     validate_required_environment()
@@ -42,13 +44,16 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Create tables; never crash on DB init failure — serve degraded instead.
     if settings.database_enabled:
         import asyncio as _asyncio
+
         try:
             async with _asyncio.timeout(20):
                 async with engine.begin() as conn:
                     await conn.run_sync(Base.metadata.create_all)
             logger.info("database_tables_verified_and_created")
         except Exception as e:
-            logger.error(f"database_initialization_failed: {e} — degraded mode, /health will still serve")
+            logger.error(
+                f"database_initialization_failed: {e} — degraded mode, /health will still serve"
+            )
 
     logger.info(
         "application_starting",
@@ -63,6 +68,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         yield
     finally:
         logger.info("application_stopping", extra={"service": settings.service_name})
+
 
 def create_app() -> FastAPI:
     """Build and configure the CivicOs API application."""
@@ -102,5 +108,6 @@ def create_app() -> FastAPI:
 
     application.include_router(api_router)
     return application
+
 
 app = create_app()

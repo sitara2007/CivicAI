@@ -1,7 +1,7 @@
 import sys
 import types
 import zlib
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 import numpy as np
 import pytest
@@ -18,12 +18,14 @@ EMBEDDING_DIM = 384
 def _fake_encode(sentences, *args, **kwargs):
     single = isinstance(sentences, str)
     items = [sentences] if single else list(sentences)
-    vectors = np.stack([
-        np.random.default_rng(zlib.crc32(s.encode("utf-8"))).random(
-            EMBEDDING_DIM, dtype=np.float32
-        )
-        for s in items
-    ])
+    vectors = np.stack(
+        [
+            np.random.default_rng(zlib.crc32(s.encode("utf-8"))).random(
+                EMBEDDING_DIM, dtype=np.float32
+            )
+            for s in items
+        ]
+    )
     return vectors[0] if single else vectors
 
 
@@ -61,17 +63,10 @@ def mock_postgres_audit_store(monkeypatch):
     fake_64_hash = "a" * 64
 
     mock_store.append.return_value = AuditEntry(
-        sequence=1,
-        prev_hash="genesis",
-        payload={},
-        hash=fake_64_hash
+        sequence=1, prev_hash="genesis", payload={}, hash=fake_64_hash
     )
 
-    monkeypatch.setattr(
-        process,
-        "PostgresAuditStore",
-        lambda session: mock_store
-    )
+    monkeypatch.setattr(process, "PostgresAuditStore", lambda session: mock_store)
 
 
 @pytest.fixture(autouse=True)
@@ -89,7 +84,9 @@ def no_database_connection(monkeypatch):
         def __init__(self, session):
             self._session = session
 
-        async def create_document(self, *, document_id, trace_id, raw_text, source_type):
+        async def create_document(
+            self, *, document_id, trace_id, raw_text, source_type
+        ):
             self._session.documents[document_id] = Document(
                 id=document_id,
                 trace_id=trace_id,
@@ -100,7 +97,9 @@ def no_database_connection(monkeypatch):
         async def mark_processing(self, document_id):
             self._session.documents[document_id].status = DocumentStatus.PROCESSING
 
-        async def save_redacted(self, *, document_id, trace_id, redacted_text, entity_count):
+        async def save_redacted(
+            self, *, document_id, trace_id, redacted_text, entity_count
+        ):
             self._session.entity_counts[trace_id] = entity_count
 
         async def save_decision(

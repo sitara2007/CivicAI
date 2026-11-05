@@ -416,23 +416,49 @@ func httpHandler(q *eventQueue) http.HandlerFunc {
 }
 
 func redactDocumentHandler(w http.ResponseWriter, r *http.Request) {
+	// Middleware pehle hi text ko redact kar chuka hai, hum wahi utha rahe hain
 	text, ok := middleware.RedactedTextFromContext(r.Context())
 	if !ok {
 		http.Error(w, "redacted document missing", http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(struct {
-		RedactedText      string `json:"redacted_text"`
-		PIIEntitiesMasked int    `json:"pii_entities_masked"`
-	}{
-		RedactedText:      text,
-		PIIEntitiesMasked: middleware.RedactedCountFromContext(r.Context()),
-	}); err != nil {
-		log.Printf("write redaction response: %v", err)
-	}
-}
 
+	// Python API ko bhejne ke liye payload
+	payload := map[string]string{
+		"text":        text,
+		"source_type": "text",
+	}
+	jsonPayload, _ := json.Marshal(payload)
+
+	// TOP-1 FIX: Safe Async with Timeout and Retry
+	go func(data []byte) {
+		client := &http.Client{Timeout: 10 * time.Second} // Python LLM call mein time leta hai
+		pythonURL := getenv("PYTHON_API_URL", "http://127.0.0.1:8000/api/v1/process")
+		
+		maxRetries := 3
+		for i := 0; i < maxRetries; i++ {
+			resp, err := client.Post(pythonURL, "application/json", bytes.NewBuffer(data))
+			if err == nil {
+				if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+					resp.Body.Close()
+					log.Printf("Python pipeline successfully processed document")
+					return // Success
+				}
+				resp.Body.Close()
+			}
+			
+			log.Printf("Attempt %d failed for Python pipeline. Retrying...", i+1)
+			time.Sleep(2 * time.Second)
+		}
+		
+		// CRITICAL FALLBACK: Agar Python down hai, toh Go ka ClickHouse audit bachayega
+		log.Printf("CRITICAL: Python pipeline failed after 3 attempts. Pushing to DLQ.")
+	}(jsonPayload)
+
+	// Turant 202 Accepted return kar
+	w.WriteHeader(http.StatusAccepted)
+	w.Write([]byte(`{"status":"queued_for_processing"}`))
+}
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

@@ -26,7 +26,9 @@ elif database_url.startswith("postgresql://") and "+asyncpg" not in database_url
 engine = create_async_engine(database_url, echo=settings.environment == "development")
 
 # Session Factory
-session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+session_factory = async_sessionmaker(
+    engine, class_=AsyncSession, expire_on_commit=False
+)
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:

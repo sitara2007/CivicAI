@@ -9,7 +9,9 @@ def test_jsonl_audit_chain_appends_and_verifies(tmp_path) -> None:
     store = JSONLAuditStore(tmp_path / "audit.jsonl")
 
     first = store.append({"route": "Public Works", "redacted_text": "SSN <US_SSN>"})
-    second = store.append({"route": "Water Utilities", "redacted_text": "Leak reported"})
+    second = store.append(
+        {"route": "Water Utilities", "redacted_text": "Leak reported"}
+    )
 
     assert first.sequence == 0
     assert second.sequence == 1

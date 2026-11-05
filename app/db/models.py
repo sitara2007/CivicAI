@@ -8,8 +8,7 @@ from enum import StrEnum
 from typing import Any
 from uuid import UUID, uuid4
 
-from sqlalchemy import Integer, String, JSON
-from sqlalchemy import Boolean, DateTime, Float, Text, func, text
+from sqlalchemy import JSON, Boolean, DateTime, Float, Integer, String, Text, func, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from app.schemas.process import SourceType
@@ -64,16 +63,22 @@ class AuditLog:
     event_metadata: dict[str, Any]
     prev_hash: str
     timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
+
+
 class Base(DeclarativeBase):
     pass
+
 
 class SQLAuditLog(Base):
     __tablename__ = "audit_logs"
 
-    sequence: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
+    sequence: Mapped[int] = mapped_column(
+        Integer, primary_key=True, autoincrement=False
+    )
     prev_hash: Mapped[str] = mapped_column(String, nullable=False)
     payload: Mapped[dict] = mapped_column(JSON, nullable=False)
     hash: Mapped[str] = mapped_column(String, nullable=False)
+
 
 class SQLDocument(Base):
     __tablename__ = "documents"
@@ -107,7 +112,9 @@ class SQLDecision(Base):
     decision_rationale: Mapped[str] = mapped_column(Text, nullable=False, default="")
     summary: Mapped[str] = mapped_column(Text, nullable=False, default="")
     hop_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    requires_review: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    requires_review: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False
+    )
     latency_ms: Mapped[float | None] = mapped_column(Float, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False

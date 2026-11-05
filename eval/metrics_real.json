@@ -1,0 +1,39 @@
+{
+  "model": "openai/gpt-oss-120b",
+  "eval_set": "eval_set_50_synthetic",
+  "accuracy": 88.0,
+  "correct": 44,
+  "total": 50,
+  "errors": [
+    {
+      "id": "rep-04",
+      "truth": "Report",
+      "pred": "Other"
+    },
+    {
+      "id": "rep-06",
+      "truth": "Report",
+      "pred": "Other"
+    },
+    {
+      "id": "rep-09",
+      "truth": "Report",
+      "pred": "Other"
+    },
+    {
+      "id": "rep-05",
+      "truth": "Report",
+      "pred": "Other"
+    },
+    {
+      "id": "rep-12",
+      "truth": "Report",
+      "pred": "Other"
+    },
+    {
+      "id": "rep-11",
+      "truth": "Report",
+      "pred": "Other"
+    }
+  ]
+}

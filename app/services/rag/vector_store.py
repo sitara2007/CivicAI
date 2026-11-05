@@ -39,16 +39,23 @@ def _local_reset_hint(path: Path) -> str:
 
 def _init_qdrant_client() -> QdrantClient:
     if settings.qdrant_url.strip():
-        logger.info("qdrant_client_initializing", extra={"mode": "remote", "url": settings.qdrant_url})
+        logger.info(
+            "qdrant_client_initializing",
+            extra={"mode": "remote", "url": settings.qdrant_url},
+        )
         return QdrantClient(url=settings.qdrant_url)
 
     local_path = Path(settings.rag_qdrant_path)
-    logger.info("qdrant_client_initializing", extra={"mode": "local", "path": str(local_path)})
+    logger.info(
+        "qdrant_client_initializing", extra={"mode": "local", "path": str(local_path)}
+    )
     try:
         return QdrantClient(path=str(local_path))
     except Exception as exc:
         error_message = _local_reset_hint(local_path)
-        logger.exception("qdrant_local_initialization_failed", extra={"path": str(local_path)})
+        logger.exception(
+            "qdrant_local_initialization_failed", extra={"path": str(local_path)}
+        )
         raise RuntimeError(error_message) from exc
 
 

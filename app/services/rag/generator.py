@@ -10,7 +10,9 @@ class Generator:
         self.settings = get_settings()
         self.use_mock = self.settings.use_mock_llm
         if not self.use_mock:
-            self.client = OpenAI(api_key=self.settings.openai_api_key or "missing-api-key")
+            self.client = OpenAI(
+                api_key=self.settings.openai_api_key or "missing-api-key"
+            )
         self.model = SentenceTransformer("all-MiniLM-L6-v2")
 
     def get_answer(self, question):
@@ -18,10 +20,10 @@ class Generator:
             return f"Mock response for: {question}"
 
         chunks = retrieve(question)
-        context = "\n".join([c['text'] for c in chunks])
+        context = "\n".join([c["text"] for c in chunks])
         prompt = f"Use this context to answer the question: {context}\n\nQuestion: {question}"
         response = self.client.chat.completions.create(
             model=self.settings.openai_model,
-            messages=[{"role": "user", "content": prompt}]
+            messages=[{"role": "user", "content": prompt}],
         )
         return response.choices[0].message.content

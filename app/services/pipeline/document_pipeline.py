@@ -38,9 +38,11 @@ class DocumentPipeline:
         if pii_found:
             masked_text = PIIAnalyzer.mask_pii(text_content)
             # Push to Redis queue (via BackgroundTaskWorker)
-            task_id = await self.worker.enqueue_task({
-                "file_path": file_path,
-                "pii_detected": pii_found,
-                "masked_content": masked_text,
-            })
+            task_id = await self.worker.enqueue_task(
+                {
+                    "file_path": file_path,
+                    "pii_detected": pii_found,
+                    "masked_content": masked_text,
+                }
+            )
             return task_id

@@ -52,7 +52,9 @@ async def initialize_database(database_url: str | None = None) -> None:
 
     url = database_url or get_settings().database_url
     if not url.strip():
-        raise RuntimeError("Set DATABASE_URL or POSTGRES_URL before initializing the database")
+        raise RuntimeError(
+            "Set DATABASE_URL or POSTGRES_URL before initializing the database"
+        )
 
     engine = create_async_engine(url)
     try:

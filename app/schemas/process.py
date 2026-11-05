@@ -15,6 +15,7 @@ class SourceType(StrEnum):
     PDF = "pdf"
     FORM = "form"
 
+
 class DocumentCategory(StrEnum):
     COMPLAINT = "Complaint"
     REQUEST = "Request"

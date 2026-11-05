@@ -76,9 +76,7 @@ class ProcessService:
         await self._session.commit()
         return result
 
-    def _persist_redacted_callback(
-        self, document_id: uuid.UUID, trace_id: uuid.UUID
-    ):
+    def _persist_redacted_callback(self, document_id: uuid.UUID, trace_id: uuid.UUID):
         async def _save(redacted_text: str, entity_count: int) -> None:
             await self._repo.save_redacted(
                 document_id=document_id,
@@ -118,7 +116,9 @@ class ProcessService:
         return ProcessPollResponse(
             trace_id=doc.trace_id,
             document_id=doc.id,
-            status=doc.status.value if hasattr(doc.status, "value") else str(doc.status),
+            status=doc.status.value
+            if hasattr(doc.status, "value")
+            else str(doc.status),
             source_type=doc.source_type,
             decision=decision_output,
             hop_count=hop_count,
