@@ -24,6 +24,10 @@ class PipelineResult:
     hop_count: int = 0
     pii_entities_masked: int = 0
     redacted_text: str | None = None
+    entities: list[dict] | None = None  # FIX: Return entities
+    normalized_text: str | None = (
+        None  # FIX: Return normalized text for offset referent
+    )
 
 
 class PipelineService:
@@ -49,14 +53,14 @@ class PipelineService:
                 max_tokens=self._settings.max_document_tokens,
             )
             redacted_text, entities = sanitize(normalized)
+
             if persist_redacted is not None:
                 await persist_redacted(redacted_text, entities)
 
+            # FIX: Removed duplicate logger
             logger.info(
-                "pii_redacted", extra={"trace_id": str(trace_id), "entities": entities}
-            )
-            logger.info(
-                "pii_redacted", extra={"trace_id": str(trace_id), "entities": entities}
+                "pii_redacted",
+                extra={"trace_id": str(trace_id), "entities": len(entities)},
             )
 
             policy_context = self._retrieve_policy_context(redacted_text, trace_id)
@@ -74,6 +78,8 @@ class PipelineService:
                 hop_count=hop_count,
                 pii_entities_masked=len(entities),
                 redacted_text=redacted_text,
+                entities=entities,  # FIX: Pass forward
+                normalized_text=normalized,  # FIX: Pass forward
             )
         except SanitizationError:
             logger.error(
@@ -95,7 +101,6 @@ class PipelineService:
     def _retrieve_policy_context(self, query: str, trace_id: uuid.UUID) -> str:
         if not self._settings.rag_enabled:
             return ""
-
         try:
             from app.services.rag.retriever import retrieve
 
@@ -106,7 +111,6 @@ class PipelineService:
                 extra={"trace_id": str(trace_id), "error": str(exc)},
             )
             return ""
-
         context = "\n\n".join(chunk["text"] for chunk in chunks if chunk.get("text"))
         return context[: self._settings.rag_context_max_chars]
 
@@ -123,9 +127,6 @@ class PipelineService:
 
         redacted_text, _ = sanitize(text)
         process_document_task.delay(
-            str(trace_id),
-            str(document_id),
-            redacted_text,
-            source_type.value,
+            str(trace_id), str(document_id), redacted_text, source_type.value
         )
         return PipelineResult(status="pending", decision=None, requires_review=False)
