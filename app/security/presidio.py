@@ -23,7 +23,6 @@ ENTITIES = [
     "US_BANK_NUMBER",
 ]
 
-# Regex fallback when Presidio/spaCy unavailable (dev bootstrap)
 _REGEX_PATTERNS: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"\b\d{3}-\d{2}-\d{4}\b"), "<US_SSN>"),
     (re.compile(r"\b\d{3}[-.]?\d{3}[-.]?\d{4}\b"), "<PHONE_NUMBER>"),
@@ -37,7 +36,9 @@ class SanitizationError(Exception):
 
 def _regex_fallback(text: str) -> tuple[str, list[dict]]:
     entities = []
-    for pattern, _ in _REGEX_PATTERNS:
+    redacted = text
+    # FIX: Removed the duplicate append loop
+    for pattern, replacement in _REGEX_PATTERNS:
         for match in pattern.finditer(text):
             entities.append(
                 {
@@ -47,16 +48,6 @@ def _regex_fallback(text: str) -> tuple[str, list[dict]]:
                     "score": 1.0,
                 }
             )
-            entities.append(
-                {
-                    "type": "REGEX",
-                    "start": match.start(),
-                    "end": match.end(),
-                    "score": 1.0,
-                }
-            )
-    redacted = text
-    for pattern, replacement in _REGEX_PATTERNS:
         redacted = pattern.sub(replacement, redacted)
     return redacted, entities
 
@@ -80,18 +71,15 @@ def _analyze_and_anonymize(text: str) -> tuple[str, list[dict]]:
         ]
         return anonymized.text, entities
     except Exception as exc:
-        logger.warning("presidio_fallback_to_regex", extra={"error": str(exc)})
-        return _regex_fallback(text)
+        # FIX: Fail closed. No silent regex bypass in production.
+        logger.error("presidio_failed_failing_closed", extra={"error": str(exc)})
+        raise SanitizationError(
+            "Presidio engine crashed. Failing closed to prevent PII leak."
+        ) from exc
 
 
 def sanitize(text: str) -> tuple[str, list[dict]]:
-    """Mask PII before any LLM transmission. Fail closed on circuit open.
-
-    Returns (redacted_text, entities) where entities is a list of
-    {"type", "start", "end", "score"} dicts. Offsets are on the INPUT text,
-    not the redacted output — this is what makes the audit log an
-    independent record of what was detected and where.
-    """
+    """Mask PII before any LLM transmission. Fail closed on circuit open."""
     try:
         return presidio_breaker.call(_analyze_and_anonymize, text)
     except pybreaker.CircuitBreakerError as exc:

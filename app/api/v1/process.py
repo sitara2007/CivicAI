@@ -19,8 +19,6 @@ from app.schemas.process import (
     ProcessRequest,
     ProcessResponse,
 )
-
-# NAYA IMPORT: PostgresAuditStore
 from app.services.audit.postgres_store import PostgresAuditStore
 from app.services.pipeline import PipelineService
 
@@ -97,22 +95,23 @@ async def process_document(
         and result.decision is not None
         and result.redacted_text is not None
     ):
+        # THE EXACT FIX: Persist referent text and exact spans
         audit_payload = {
             "trace_id": str(trace_id),
             "document_id": str(document_id),
             "redacted_text": result.redacted_text,
+            "normalized_text": result.normalized_text,  # <--- ADDED
+            "entities": result.entities,  # <--- ADDED
             "pii_entities_masked": result.pii_entities_masked,
             "decision": result.decision.model_dump(mode="json"),
             "created_at": created_at.isoformat(),
         }
 
         try:
-            # YAHAN CHANGE HUA HAI: DB Store use karo agar session hai
             if session is not None:
                 db_audit_store = PostgresAuditStore(session)
                 entry = await db_audit_store.append(audit_payload)
             else:
-                # Fallback for tests (without DB)
                 import asyncio
 
                 from app.services.audit.chain_store import audit_store
