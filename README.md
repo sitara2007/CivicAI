@@ -4,6 +4,8 @@
 
 Designed to reduce manual document-triage effort. End-to-end latency, classification quality and audit-integrity guarantees have not been independently benchmarked.
 
+Building the reference implementation for India DPDP Act 2023 compliance in AI pipelines. Tamper-evident audit logs for LLMs.
+
 [![CI](https://github.com/sitara2007/CivicAI/actions/workflows/ci.yml/badge.svg)](https://github.com/sitara2007/CivicAI/actions/workflows/ci.yml)
 
 [Live demo](https://civic-ai-nu-ten.vercel.app) · [Benchmarks](./BENCHMARKS.md) · [Security](./SECURITY.md)
