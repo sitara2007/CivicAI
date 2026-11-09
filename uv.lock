@@ -633,6 +633,7 @@ dependencies = [
     { name = "asyncpg" },
     { name = "celery" },
     { name = "fastapi", extra = ["standard"] },
+    { name = "httpx" },
     { name = "instructor" },
     { name = "numpy" },
     { name = "openai" },
@@ -651,7 +652,6 @@ dependencies = [
 
 [package.optional-dependencies]
 dev = [
-    { name = "httpx" },
     { name = "numpy" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
@@ -667,6 +667,7 @@ rag = [
 [package.dev-dependencies]
 dev = [
     { name = "pre-commit" },
+    { name = "pytest" },
     { name = "ruff" },
 ]
 
@@ -675,7 +676,7 @@ requires-dist = [
     { name = "asyncpg", specifier = ">=0.29" },
     { name = "celery", specifier = ">=5.4" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115" },
-    { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.27" },
+    { name = "httpx", specifier = ">=0.27" },
     { name = "instructor", specifier = ">=1.17.0" },
     { name = "numpy", specifier = "<2.5.0" },
     { name = "numpy", marker = "extra == 'dev'", specifier = ">=1.26,<2.5.0" },
@@ -704,6 +705,7 @@ provides-extras = ["rag", "dev"]
 [package.metadata.requires-dev]
 dev = [
     { name = "pre-commit", specifier = ">=4.7.0" },
+    { name = "pytest", specifier = ">=9.0.3" },
     { name = "ruff", specifier = ">=0.17.3" },
 ]
 

@@ -37,6 +37,11 @@ class Settings(BaseSettings):
 
     database_url: str = ""
     database_enabled: bool = True
+    zoho_client_id: str = ""
+    zoho_client_secret: str = ""
+    zoho_redirect_uri: str = "http://localhost:8000/api/v1/zoho/callback"
+    zoho_dc: str = "in"
+    zoho_scopes: str = "ZohoCRM.modules.contacts.READ"
     redis_url: str = "redis://localhost:6379/0"
     celery_broker_url: str | None = None
     qdrant_url: str = ""
