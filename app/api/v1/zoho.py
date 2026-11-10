@@ -22,6 +22,9 @@ from app.integrations.zoho.oauth import (
     refresh_access_token,
 )
 
+from pydantic import BaseModel
+from typing import Any, Dict
+
 router = APIRouter(prefix="/api/v1/zoho", tags=["zoho"])
 logger = logging.getLogger(__name__)
 
@@ -129,3 +132,30 @@ async def get_contact(
         if exc.retryable:
             raise HTTPException(503, str(exc)) from exc
         raise HTTPException(502, str(exc)) from exc
+
+
+class ZohoWebhookPayload(BaseModel):
+    module: str
+    operation: str
+    ids: list[str]
+    data: Dict[str, Any]
+
+
+@router.post("/webhook")
+async def receive_zoho_webhook(payload: ZohoWebhookPayload):
+    """
+    Receives real-time triggers from Zoho CRM when a document is attached/updated.
+    """
+    logger.info(
+        f"Received Zoho Webhook for module: {payload.module}, op: {payload.operation}"
+    )
+
+    if payload.module == "Attachments" or "document" in payload.operation.lower():
+        logger.info("Document detected! Triggering CivicAI parsing pipeline...")
+        # TODO: Call Celery task here: parse_document.delay(payload.ids[0])
+        return {
+            "status": "success",
+            "message": "Document received and queued for parsing.",
+        }
+
+    return {"status": "ignored", "message": "Not a document event."}

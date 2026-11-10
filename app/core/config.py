@@ -74,6 +74,10 @@ class Settings(BaseSettings):
     def broker_url(self) -> str:
         return self.celery_broker_url or self.redis_url
 
+    @property
+    def zoho_enabled(self) -> bool:
+        return bool(self.zoho_client_id and self.zoho_client_secret)
+
 
 def _load_env_alias(*names: str) -> str | None:
     for name in names:
