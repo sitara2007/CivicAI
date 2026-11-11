@@ -37,6 +37,11 @@ class Settings(BaseSettings):
 
     database_url: str = ""
     database_enabled: bool = True
+    zoho_client_id: str = ""
+    zoho_client_secret: str = ""
+    zoho_redirect_uri: str = "http://localhost:8000/api/v1/zoho/callback"
+    zoho_dc: str = "in"
+    zoho_scopes: str = "ZohoCRM.modules.contacts.READ"
     redis_url: str = "redis://localhost:6379/0"
     celery_broker_url: str | None = None
     qdrant_url: str = ""
@@ -68,6 +73,10 @@ class Settings(BaseSettings):
     @property
     def broker_url(self) -> str:
         return self.celery_broker_url or self.redis_url
+
+    @property
+    def zoho_enabled(self) -> bool:
+        return bool(self.zoho_client_id and self.zoho_client_secret)
 
 
 def _load_env_alias(*names: str) -> str | None:
