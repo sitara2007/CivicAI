@@ -142,4 +142,4 @@ uv sync --extra dev --extra rag
 
 ## License
 
-MIT
+MIT /apache
